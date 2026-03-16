@@ -10,6 +10,7 @@ class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
   @override
   Widget build(BuildContext context) {
+
     final ChatController controller = Get.put(ChatController());
 
     return Scaffold(
@@ -28,9 +29,11 @@ class ChatPage extends StatelessWidget {
 
       drawer: ChatDrawer(controller: controller),
 
-      body: Obx(() => controller.messages.isEmpty
-          ? const _EmptyState()
-          : _MessageList(controller: controller)),
+      body: SafeArea(
+        child: Obx(() => controller.messages.isEmpty
+            ? const _EmptyState()
+            : _MessageList(controller: controller)),
+      ),
 
       bottomNavigationBar: Builder(
         builder: (ctx) => Padding(

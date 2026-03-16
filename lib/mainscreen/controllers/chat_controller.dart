@@ -41,8 +41,11 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     if (isLoggedIn) {
-      _createNewSession();
-      fetchChatSessions();
+      // _createNewSession();
+      // fetchChatSessions();
+      if (isLoggedIn) {
+        fetchChatSessions();   // only load history, no session created yet
+      }
     }
   }
 
@@ -76,14 +79,22 @@ class ChatController extends GetxController {
   }
 
   /// Called from the drawer "New Chat" button.
+  // Future<void> startNewChat() async {
+  //   if (isLoggedIn) {
+  //     await _createNewSession();
+  //   } else {
+  //     messages.clear();
+  //     sessionId.value = null;
+  //   }
+  // }
+
   Future<void> startNewChat() async {
-    if (isLoggedIn) {
-      await _createNewSession();
-    } else {
-      messages.clear();
-      sessionId.value = null;
-    }
+    // same behavior for both logged-in and guest:
+    // just clear the screen, session will be created on first send
+    messages.clear();
+    sessionId.value = null;
   }
+
 
   /// Fetch all sessions for the History section in the drawer.
   Future<void> fetchChatSessions() async {
