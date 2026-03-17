@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/mainscreen/terms&conditionpage.dart';
 import 'package:get/get.dart';
 
+import '../core/app_text.dart';
 import 'controllers/profileController.dart';
 
 
@@ -20,19 +21,15 @@ class Profile extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Profile",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        title: const AppText(
+          data: "Profile",
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
         ),
         centerTitle: false,
       ),
 
       body: Obx(() {
-        // Profile data loading
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -73,20 +70,16 @@ class Profile extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Obx(() => Text(
-                          controller.userName.value,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Obx(() => AppText(
+                          data: controller.userName.value,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         )),
                         const SizedBox(height: 4),
-                        Obx(() => Text(
-                          controller.userEmail.value,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
+                        Obx(() => AppText(
+                          data: controller.userEmail.value,
+                          fontSize: 13,
+                          color: Colors.grey,
                         )),
                       ],
                     ),
@@ -113,10 +106,10 @@ class Profile extends StatelessWidget {
                                   Icons.mode_edit_outlined,
                                   color: Colors.black,
                                 ),
-                                title: const Text("Edit"),
+                                title: const AppText(data: "Edit", fontSize: 15),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  controller.showEditEmailDialog(context);
+                                  controller.showEditUsernameDialog(context);
                                 },
                               ),
                               const Divider(),
@@ -125,18 +118,14 @@ class Profile extends StatelessWidget {
                               Obx(() => ListTile(
                                 leading: controller.isDeleting.value
                                     ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
+                                  height: 20, width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     color: Colors.red,
                                   ),
                                 )
-                                    : const Icon(
-                                  Icons.delete,
-                                  color: Colors.black,
-                                ),
-                                title: const Text("Delete"),
+                                    : const Icon(Icons.delete, color: Colors.black),
+                                title: const AppText(data: "Delete", fontSize: 15),
                                 onTap: controller.isDeleting.value
                                     ? null
                                     : () {
@@ -160,11 +149,11 @@ class Profile extends StatelessWidget {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> Termsconditionpage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Termsconditionpage()));
               },
               child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -182,12 +171,10 @@ class Profile extends StatelessWidget {
                     Icon(Icons.safety_check, color: Colors.black),
                     SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        "Terms and Privacy Policy",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: AppText(
+                        data: "Terms and Privacy Policy",
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),
@@ -203,8 +190,7 @@ class Profile extends StatelessWidget {
             InkWell(
               onTap: controller.logout,
               child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -222,12 +208,10 @@ class Profile extends StatelessWidget {
                     Icon(Icons.logout, color: Colors.black),
                     SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        "Log Out",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: AppText(
+                        data: "Log Out",
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),

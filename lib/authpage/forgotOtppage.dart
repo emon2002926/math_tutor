@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../controller/authController/forgototpController.dart';
-import '../controller/authController/singupOtpController.dart';
 import '../images.dart';
 
 

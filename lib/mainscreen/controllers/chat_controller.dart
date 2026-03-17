@@ -4,135 +4,89 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/utils/storege_service.dart';
 import '../models/chat_message.dart';
-
+import 'package:http_parser/http_parser.dart';
+import 'package:record/record.dart';
 
 class ChatController extends GetxController {
   final apiServices = Get.find<ApiServices>();
 
-  // ── Image picker ───────────────────────────────────────
   final ImagePicker _picker = ImagePicker();
   final selectedImage = Rxn<File>();
 
-  // ── Text controller ────────────────────────────────────
+  // ── Audio recording ────────────────────────────────────
+  final _audioRecorder = AudioRecorder();
+  final isRecording = false.obs;
+  final selectedAudio = Rxn<File>();
+
   final textController = TextEditingController();
-
-  // ── Messages displayed in chat ─────────────────────────
   final messages = <ChatMessage>[].obs;
-
-  // ── Session (null = guest mode) ────────────────────────
   final sessionId = Rxn<int>();
-
-  // ── States ─────────────────────────────────────────────
   final isSending = false.obs;
   final isCreatingSession = false.obs;
-
-  // ── Chat sessions list (for drawer History) ────────────
   final chatSessions = <Map<String, dynamic>>[].obs;
   final isLoadingSessions = false.obs;
 
-  // ── Auth helpers ───────────────────────────────────────
   bool get isLoggedIn => StorageService.accessToken != null;
   String? get _token => StorageService.accessToken;
 
   @override
   void onInit() {
     super.onInit();
-    if (isLoggedIn) {
-      // _createNewSession();
-      // fetchChatSessions();
-      if (isLoggedIn) {
-        fetchChatSessions();   // only load history, no session created yet
-      }
-    }
+    if (isLoggedIn) fetchChatSessions();
   }
 
   @override
   void onClose() {
     textController.dispose();
+    _audioRecorder.dispose();
     super.onClose();
   }
 
   // ════════════════════════════════════════════════════════
-  // SESSION MANAGEMENT
+  // AUDIO RECORDING
   // ════════════════════════════════════════════════════════
 
-  /// Creates a brand-new session on the server and clears messages.
-  Future<void> _createNewSession() async {
-    if (!isLoggedIn) return;
-    isCreatingSession.value = true;
-    try {
-      final response = await apiServices.post(
-        '/api/chat/sessions/',
-        headers: {'Authorization': 'Bearer $_token'},
-        body: {},
-      );
-      sessionId.value = response['id'] as int;
-      messages.clear();
-    } on HttpException catch (e) {
-      _showError(_parseError(e));
-    } finally {
-      isCreatingSession.value = false;
+  Future<void> toggleRecording() async {
+    if (isRecording.value) {
+      await _stopRecording();
+    } else {
+      await _startRecording();
     }
   }
 
-  /// Called from the drawer "New Chat" button.
-  // Future<void> startNewChat() async {
-  //   if (isLoggedIn) {
-  //     await _createNewSession();
-  //   } else {
-  //     messages.clear();
-  //     sessionId.value = null;
-  //   }
-  // }
-
-  Future<void> startNewChat() async {
-    // same behavior for both logged-in and guest:
-    // just clear the screen, session will be created on first send
-    messages.clear();
-    sessionId.value = null;
+  Future<void> _startRecording() async {
+    final hasPermission = await _audioRecorder.hasPermission();
+    if (!hasPermission) {
+      _showError('Microphone permission denied');
+      return;
+    }
+    final dir = await getTemporaryDirectory();
+    final path =
+        '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    await _audioRecorder.start(
+      const RecordConfig(encoder: AudioEncoder.aacLc),
+      path: path,
+    );
+    isRecording.value = true;
   }
 
-
-  /// Fetch all sessions for the History section in the drawer.
-  Future<void> fetchChatSessions() async {
-    if (!isLoggedIn) return;
-    isLoadingSessions.value = true;
-    try {
-      final response = await apiServices.get(
-        '/api/chat/sessions/',
-        headers: {'Authorization': 'Bearer $_token'},
-      );
-      final results = response['results'] as List<dynamic>;
-      chatSessions.value =
-          results.map((e) => Map<String, dynamic>.from(e as Map)).toList();
-    } on HttpException catch (e) {
-      _showError(_parseError(e));
-    } finally {
-      isLoadingSessions.value = false;
+  Future<void> _stopRecording() async {
+    final path = await _audioRecorder.stop();
+    isRecording.value = false;
+    if (path != null) {
+      selectedAudio.value = File(path);
     }
   }
 
-  /// Tap a history item to reload that session's messages.
-  Future<void> loadSession(int id) async {
-    if (!isLoggedIn) return;
-    try {
-      final response = await apiServices.get(
-        '/api/chat/sessions/$id',
-        headers: {'Authorization': 'Bearer $_token'},
-      );
-      sessionId.value = id;
-      final rawMessages = response['messages'] as List<dynamic>;
-      messages.value = rawMessages
-          .map((m) => ChatMessage.fromJson(m as Map<String, dynamic>))
-          .toList();
-    } on HttpException catch (e) {
-      _showError(_parseError(e));
-    }
-  }
+  void removeAudio() => selectedAudio.value = null;
 
+  // ════════════════════════════════════════════════════════
+  // IMAGE
+  // ════════════════════════════════════════════════════════
 
   Future<void> pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -141,32 +95,33 @@ class ChatController extends GetxController {
 
   void removeImage() => selectedImage.value = null;
 
-
+  // ════════════════════════════════════════════════════════
+  // SEND MESSAGE
+  // ════════════════════════════════════════════════════════
 
   Future<void> sendMessage() async {
     final text = textController.text.trim();
     final image = selectedImage.value;
-    if (text.isEmpty && image == null) return;
+    final audio = selectedAudio.value;
+    if (text.isEmpty && image == null && audio == null) return;
 
-    // 1. Show user bubble immediately (optimistic)
     messages.add(ChatMessage.localUser(
       message: text,
       localImagePath: image?.path,
+      localAudioPath: audio?.path,
     ));
-
-    // 2. Show AI "typing…" placeholder
     messages.add(ChatMessage.aiLoading());
 
-    // 3. Clear input
     textController.clear();
     selectedImage.value = null;
+    selectedAudio.value = null;
     isSending.value = true;
 
     try {
       if (isLoggedIn) {
-        await _sendAuthenticated(text, image);
+        await _sendAuthenticated(text, image, audio);
       } else {
-        await _sendGuest(text, image);
+        await _sendGuest(text, image, audio);
       }
     } on HttpException catch (e) {
       _removeLoadingBubble();
@@ -179,7 +134,8 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> _sendAuthenticated(String text, File? image) async {
+  Future<void> _sendAuthenticated(
+      String text, File? image, File? audio) async {
     if (sessionId.value == null) await _createNewSession();
     final id = sessionId.value!;
     final endpoint = '/api/chat/sessions/$id/send/';
@@ -187,11 +143,12 @@ class ChatController extends GetxController {
 
     dynamic response;
 
-    if (image != null) {
+    if (image != null || audio != null) {
       response = await _multipartPost(
         endpoint: endpoint,
         extraHeaders: authHeader,
         image: image,
+        audio: audio,
         text: text,
       );
     } else {
@@ -202,28 +159,24 @@ class ChatController extends GetxController {
       );
     }
 
-    // Replace local user bubble with server's user message
     _replaceLocalUserMessage(
       ChatMessage.fromJson(response['user_message'] as Map<String, dynamic>),
     );
-
-    // Replace loading bubble with server's AI message
     _replaceLoadingBubble(
       ChatMessage.fromJson(response['ai_response'] as Map<String, dynamic>),
     );
-
-    fetchChatSessions(); // refresh history list
+    fetchChatSessions();
   }
 
-  // ── Guest ──────────────────────────────────────────────
-  Future<void> _sendGuest(String text, File? image) async {
+  Future<void> _sendGuest(String text, File? image, File? audio) async {
     const endpoint = '/api/chat/guest/';
     dynamic response;
 
-    if (image != null) {
+    if (image != null || audio != null) {
       response = await _multipartPost(
         endpoint: endpoint,
         image: image,
+        audio: audio,
         text: text,
       );
     } else {
@@ -243,13 +196,25 @@ class ChatController extends GetxController {
   Future<dynamic> _multipartPost({
     required String endpoint,
     Map<String, String>? extraHeaders,
-    required File image,
+    File? image,
+    File? audio,
     String text = '',
   }) async {
     final url = Uri.parse('${apiServices.baseUrl}$endpoint');
     final request = http.MultipartRequest('POST', url)
-      ..headers.addAll({'Accept': 'application/json', ...?extraHeaders})
-      ..files.add(await http.MultipartFile.fromPath('image', image.path));
+      ..headers.addAll({'Accept': 'application/json', ...?extraHeaders});
+
+    if (image != null) {
+      request.files
+          .add(await http.MultipartFile.fromPath('image', image.path));
+    }
+    if (audio != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'audio',
+        audio.path,
+        contentType: MediaType('audio', 'm4a'),
+      ));
+    }
     if (text.isNotEmpty) request.fields['message'] = text;
 
     final streamed = await request.send();
@@ -266,28 +231,89 @@ class ChatController extends GetxController {
     return res.body.isEmpty ? null : jsonDecode(res.body);
   }
 
+  // ════════════════════════════════════════════════════════
+  // SESSION MANAGEMENT
+  // ════════════════════════════════════════════════════════
+
+  Future<void> _createNewSession() async {
+    if (!isLoggedIn) return;
+    isCreatingSession.value = true;
+    try {
+      final response = await apiServices.post(
+        '/api/chat/sessions/',
+        headers: {'Authorization': 'Bearer $_token'},
+        body: {},
+      );
+      sessionId.value = response['id'] as int;
+    } on HttpException catch (e) {
+      _showError(_parseError(e));
+    } finally {
+      isCreatingSession.value = false;
+    }
+  }
+
+  Future<void> startNewChat() async {
+    messages.clear();
+    sessionId.value = null;
+  }
+
+  Future<void> fetchChatSessions() async {
+    if (!isLoggedIn) return;
+    isLoadingSessions.value = true;
+    try {
+      final response = await apiServices.get(
+        '/api/chat/sessions/',
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+      final results = response['results'] as List<dynamic>;
+      chatSessions.value =
+          results.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    } on HttpException catch (e) {
+      _showError(_parseError(e));
+    } finally {
+      isLoadingSessions.value = false;
+    }
+  }
+
+  Future<void> loadSession(int id) async {
+    if (!isLoggedIn) return;
+    try {
+      final response = await apiServices.get(
+        '/api/chat/sessions/$id',
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+      sessionId.value = id;
+      final rawMessages = response['messages'] as List<dynamic>;
+      messages.value = rawMessages
+          .map((m) => ChatMessage.fromJson(m as Map<String, dynamic>))
+          .toList();
+    } on HttpException catch (e) {
+      _showError(_parseError(e));
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // HELPERS
+  // ════════════════════════════════════════════════════════
 
   void _replaceLoadingBubble(ChatMessage aiMsg) {
     final idx = messages.lastIndexWhere((m) => m.isLoading);
-    if (idx != -1) {
-      messages[idx] = aiMsg;
-    } else {
-      messages.add(aiMsg);
-    }
+    if (idx != -1) messages[idx] = aiMsg;
+    else messages.add(aiMsg);
   }
 
   void _replaceLocalUserMessage(ChatMessage serverMsg) {
     for (int i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].sender == MessageSender.user && messages[i].id == null) {
+      if (messages[i].sender == MessageSender.user &&
+          messages[i].id == null) {
         messages[i] = serverMsg;
         break;
       }
     }
   }
 
-  void _removeLoadingBubble() => messages.removeWhere((m) => m.isLoading);
-
-
+  void _removeLoadingBubble() =>
+      messages.removeWhere((m) => m.isLoading);
 
   String _parseError(HttpException e) {
     try {
@@ -302,13 +328,10 @@ class ChatController extends GetxController {
   }
 
   void _showError(String message) {
-    Get.snackbar(
-      'Error',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red.shade100,
-      colorText: Colors.red.shade900,
-      margin: const EdgeInsets.all(12),
-    );
+    Get.snackbar('Error', message,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+        margin: const EdgeInsets.all(12));
   }
 }

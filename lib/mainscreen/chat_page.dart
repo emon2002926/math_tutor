@@ -3,7 +3,9 @@ import 'package:flutter_project/core/app_text.dart';
 import 'package:flutter_project/mainscreen/controllers/chat_controller.dart';
 import 'package:flutter_project/mainscreen/widgets/chat_drawer.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:io';
+import '../core/widgets/math_text.dart';
 import 'models/chat_message.dart';
 
 class ChatPage extends StatelessWidget {
@@ -160,7 +162,7 @@ class _UserBubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // Image (local or remote)
+                // ── Image ──
                 if (message.localImagePath != null ||
                     message.imageUrl != null) ...[
                   ClipRRect(
@@ -173,23 +175,39 @@ class _UserBubble extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                 ],
-                // Text
+
+                // ── Audio ──
+                if (message.localAudioPath != null ||
+                    message.audioUrl != null) ...[
+                  _AudioBubble(
+                    localPath: message.localAudioPath,
+                    remoteUrl: message.audioUrl,
+                  ),
+                  const SizedBox(height: 4),
+                ],
+
+                // ── Text ──
                 if (message.message.isNotEmpty)
                   Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.72),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF1F2A44),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(18),
-                          topRight: Radius.circular(18),
-                          bottomLeft: Radius.circular(18),
-                          bottomRight: Radius.circular(4),
-                        ),
+                    constraints: BoxConstraints(
+                        maxWidth:
+                        MediaQuery.of(context).size.width * 0.72),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF1F2A44),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18),
+                        bottomLeft: Radius.circular(18),
+                        bottomRight: Radius.circular(4),
                       ),
-                      child: AppText(data: message.message, color: Colors.white, fontSize: 15)),
+                    ),
+                    child: AppText(
+                        data: message.message,
+                        color: Colors.white,
+                        fontSize: 15),
+                  ),
               ],
             ),
           ),
@@ -198,7 +216,142 @@ class _UserBubble extends StatelessWidget {
     );
   }
 }
+// ── Audio Player Widget ─────────────────────────────────
+class _AudioBubble extends StatefulWidget {
+  final String? localPath;
+  final String? remoteUrl;
+  const _AudioBubble({this.localPath, this.remoteUrl});
 
+  @override
+  State<_AudioBubble> createState() => _AudioBubbleState();
+}
+
+class _AudioBubbleState extends State<_AudioBubble> {
+  late final AudioPlayer _player;
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _initAudio();
+
+    _player.playerStateStream.listen((state) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = state.playing &&
+              state.processingState != ProcessingState.completed;
+        });
+      }
+    });
+
+    _player.durationStream.listen((d) {
+      if (mounted) setState(() => _duration = d ?? Duration.zero);
+    });
+
+    _player.positionStream.listen((p) {
+      if (mounted) setState(() => _position = p);
+    });
+  }
+
+  Future<void> _initAudio() async {
+    try {
+      if (widget.localPath != null) {
+        await _player.setFilePath(widget.localPath!);
+      } else if (widget.remoteUrl != null) {
+        final url = widget.remoteUrl!.startsWith('http')
+            ? widget.remoteUrl!
+            : 'https://mathapi.dsrt321.online${widget.remoteUrl}';
+        await _player.setUrl(url);
+      }
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  String _fmt(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = _duration.inMilliseconds > 0
+        ? _position.inMilliseconds / _duration.inMilliseconds
+        : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2A44),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              if (_isPlaying) {
+                await _player.pause();
+              } else {
+                if (_player.processingState == ProcessingState.completed) {
+                  await _player.seek(Duration.zero);
+                }
+                await _player.play();
+              }
+            },
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _isPlaying ? Icons.pause : Icons.play_arrow,
+                color: const Color(0xFF1F2A44),
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 120,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress.clamp(0.0, 1.0),
+                    backgroundColor: Colors.white24,
+                    valueColor:
+                    const AlwaysStoppedAnimation<Color>(Colors.white),
+                    minHeight: 3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${_fmt(_position)} / ${_fmt(_duration)}',
+                  style: const TextStyle(
+                      color: Colors.white70, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _AiBubble extends StatelessWidget {
   final ChatMessage message;
@@ -212,29 +365,32 @@ class _AiBubble extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.78),
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(18),
-                  bottomLeft: Radius.circular(18),
-                  bottomRight: Radius.circular(18),
-                ),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.78),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(4),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
               ),
-              child: message.isLoading
-                  ? const _TypingIndicator()
-                  : AppText(data: message.message, color: Colors.black87, fontSize: 15)),
-
+            ),
+            child: message.isLoading
+                ? const _TypingIndicator()
+                : MathText(           // ← replaced AppText with MathText
+              data: message.message,
+              color: Colors.black87,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
 
 class _TypingIndicator extends StatefulWidget {
   const _TypingIndicator();
@@ -307,94 +463,151 @@ class _ChatInputBar extends StatelessWidget {
       decoration: const BoxDecoration(color: Color(0xFF1F2A44)),
       child: SafeArea(
         top: false,
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Mic
-            IconButton(
-              icon: const Icon(Icons.mic, color: Colors.white),
-              onPressed: () {},
-            ),
 
-            // Image picker
-            Obx(() => GestureDetector(
-              onTap: controller.pickImage,
-              onLongPress: controller.removeImage,
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: controller.selectedImage.value != null
-                    ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    controller.selectedImage.value!,
-                    fit: BoxFit.cover,
-                  ),
-                )
-                    : const Icon(Icons.image,
-                    color: Colors.grey, size: 20),
-              ),
-            )),
-
-            const SizedBox(width: 8),
-
-            // Text field
-            Expanded(
-              child: TextField(
-                controller: controller.textController,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => controller.sendMessage(),
-                decoration: InputDecoration(
-                  hintText: "Ask anything",
-                  hintStyle:
-                  TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 8),
-
-            // Send
-            Obx(() => GestureDetector(
-              onTap: controller.isSending.value
-                  ? null
-                  : controller.sendMessage,
-              child: Container(
-                width: 38,
-                height: 38,
+            // ── Audio preview (shows after recording stops) ──
+            Obx(() {
+              if (controller.selectedAudio.value == null) {
+                return const SizedBox.shrink();
+              }
+              return Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: controller.isSending.value
-                    ? const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2),
-                )
-                    : const Icon(Icons.send,
-                    color: Colors.white, size: 18),
-              ),
-            )),
+                child: Row(
+                  children: [
+                    const Icon(Icons.audiotrack,
+                        color: Colors.white, size: 18),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: AppText(
+                          data: 'Audio ready — tap send',
+                          color: Colors.white,
+                          fontSize: 13),
+                    ),
+                    GestureDetector(
+                      onTap: controller.removeAudio,
+                      child: const Icon(Icons.close,
+                          color: Colors.white70, size: 18),
+                    ),
+                  ],
+                ),
+              );
+            }),
+
+            // ── Main input row ──────────────────────────────
+            Row(
+              children: [
+
+                // Mic — hold to record, tap again to stop
+                Obx(() => GestureDetector(
+                  onTap: controller.toggleRecording,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: controller.isRecording.value
+                          ? Colors.red
+                          : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      controller.isRecording.value
+                          ? Icons.stop
+                          : Icons.mic,
+                      color: Colors.white,
+                    ),
+                  ),
+                )),
+
+                // Image picker
+                Obx(() => GestureDetector(
+                  onTap: controller.pickImage,
+                  onLongPress: controller.removeImage,
+                  child: Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: controller.selectedImage.value != null
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        controller.selectedImage.value!,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : const Icon(Icons.image,
+                        color: Colors.grey, size: 20),
+                  ),
+                )),
+
+                const SizedBox(width: 8),
+
+                // Text field
+                Expanded(
+                  child: TextField(
+                    controller: controller.textController,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => controller.sendMessage(),
+                    decoration: InputDecoration(
+                      hintText: "Ask anything",
+                      hintStyle: TextStyle(
+                          color: Colors.grey.shade400, fontSize: 14),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Send
+                Obx(() => GestureDetector(
+                  onTap: controller.isSending.value
+                      ? null
+                      : controller.sendMessage,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: controller.isSending.value
+                        ? const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
+                        : const Icon(Icons.send,
+                        color: Colors.white, size: 18),
+                  ),
+                )),
+              ],
+            ),
           ],
         ),
       ),

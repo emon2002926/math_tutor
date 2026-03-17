@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_project/mainscreen/chat_page.dart';
-import 'package:flutter_project/services/auth_service.dart';
 
-import '../../authpage/signin_page.dart';
 
 class ResetPasswordController extends GetxController {
   final String email;

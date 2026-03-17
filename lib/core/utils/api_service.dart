@@ -58,6 +58,13 @@ class ApiServices {
     final response = await http.Response.fromStream(streamedResponse);
     return _handleResponse(response, url, endpoints);
   }
+  Future<dynamic> put(String endpoints, {Map<String, String>? headers, dynamic body}) async {
+    final url = Uri.parse('$baseUrl$endpoints');
+    AppLog.request(endpoints, method: 'PUT', body: body);
+    final encodedBody = body != null ? jsonEncode(body) : null;
+    final response = await _httpClient.put(url, headers: {..._defaultHeader, ...?headers}, body: encodedBody);
+    return _handleResponse(response, url, endpoints);
+  }
 
   dynamic _handleResponse(http.Response response, Uri url, String endpoint) {
     if (response.statusCode >= 200 && response.statusCode < 300) {

@@ -5,11 +5,12 @@ class ChatMessage {
   final int? sessionId;
   final MessageSender sender;
   final String message;
-  final String? imageUrl;        // server-returned image URL
-  final String? localImagePath;  // local path before upload
+  final String? imageUrl;
+  final String? localImagePath;
   final String? audioUrl;
+  final String? localAudioPath;  // ← ADD THIS
   final DateTime? createdAt;
-  final bool isLoading;          // AI "typing..." placeholder
+  final bool isLoading;
 
   const ChatMessage({
     this.id,
@@ -19,16 +20,22 @@ class ChatMessage {
     this.imageUrl,
     this.localImagePath,
     this.audioUrl,
+    this.localAudioPath,         // ← ADD THIS
     this.createdAt,
     this.isLoading = false,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
-    const baseUrl = 'https://mathapi.dsrt321.online'; // ← your actual base URL
+    const baseUrl = 'https://mathapi.dsrt321.online';
 
     String? rawImage = json['image'] as String?;
     String? fullImageUrl = (rawImage != null && rawImage.isNotEmpty)
         ? (rawImage.startsWith('http') ? rawImage : '$baseUrl$rawImage')
+        : null;
+
+    String? rawAudio = json['audio'] as String?;
+    String? fullAudioUrl = (rawAudio != null && rawAudio.isNotEmpty)
+        ? (rawAudio.startsWith('http') ? rawAudio : '$baseUrl$rawAudio')
         : null;
 
     return ChatMessage(
@@ -36,8 +43,8 @@ class ChatMessage {
       sessionId: json['session'],
       sender: json['sender'] == 'USER' ? MessageSender.user : MessageSender.ai,
       message: json['message'] ?? '',
-      imageUrl: fullImageUrl,   // ← now a full URL
-      audioUrl: json['audio'],
+      imageUrl: fullImageUrl,
+      audioUrl: fullAudioUrl,   // ← now a full URL
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -47,11 +54,13 @@ class ChatMessage {
   factory ChatMessage.localUser({
     required String message,
     String? localImagePath,
+    String? localAudioPath,      // ← ADD THIS
   }) {
     return ChatMessage(
       sender: MessageSender.user,
       message: message,
       localImagePath: localImagePath,
+      localAudioPath: localAudioPath,  // ← ADD THIS
       createdAt: DateTime.now(),
     );
   }

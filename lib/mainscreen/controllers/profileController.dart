@@ -5,13 +5,11 @@ import 'package:flutter_project/core/utils/storege_service.dart';
 import 'package:get/get.dart';
 import 'package:flutter_project/authpage/signin_page.dart';
 
+import '../../core/app_text.dart';
 import '../../core/utils/app_navigation.dart';
-import '../../services/profile_service.dart';
 
 
-import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
 import 'dart:convert';
 
 class ProfileController extends GetxController {
@@ -35,15 +33,12 @@ class ProfileController extends GetxController {
     fetchProfile();
   }
 
-  // ── Helper: parse error message from HttpException body ──
-  // Your ApiServices throws HttpException with body as raw JSON string
-  // e.g. body: '{"detail": "Not found."}'
   String _parseError(HttpException e) {
     try {
       final decoded = jsonDecode(e.body ?? '{}') as Map<String, dynamic>;
-      return decoded['detail']         ??
-          decoded['message']        ??
-          decoded['error']          ??
+      return decoded['detail'] ??
+          decoded['message']   ??
+          decoded['error']     ??
           'Something went wrong (${e.statusCode})';
     } catch (_) {
       return 'Something went wrong (${e.statusCode})';
@@ -52,8 +47,7 @@ class ProfileController extends GetxController {
 
   void _showError(String message) {
     Get.snackbar(
-      'Error',
-      message,
+      'Error', message,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red.shade100,
       colorText: Colors.red.shade900,
@@ -63,8 +57,7 @@ class ProfileController extends GetxController {
 
   void _showSuccess(String message) {
     Get.snackbar(
-      'Success',
-      message,
+      'Success', message,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.shade100,
       colorText: Colors.green.shade900,
@@ -77,11 +70,7 @@ class ProfileController extends GetxController {
   // ===========================
   Future<void> fetchProfile() async {
     isLoading.value = true;
-    print("gjkfhag:$token");
     try {
-      // ApiServices.get() → _handleResponse() → returns jsonDecode(body)
-      // so response is already Map<String, dynamic>
-
       final response = await apiServices.get(
         '/api/users/profile/',
         headers: {'Authorization': 'Bearer $token'},
@@ -89,9 +78,7 @@ class ProfileController extends GetxController {
       profile.value  = UserProfile.fromJson(response as Map<String, dynamic>);
       userName.value  = profile.value?.username ?? '';
       userEmail.value = profile.value?.email    ?? '';
-      // userImage.value = profile.value?.image    ?? '';
     } on HttpException catch (e) {
-      print('FetchProfile Error ${e.statusCode}: ${e.body}');
       _showError(_parseError(e));
     } finally {
       isLoading.value = false;
@@ -99,64 +86,59 @@ class ProfileController extends GetxController {
   }
 
   // ===========================
-  /// EDIT EMAIL DIALOG
+  /// EDIT USERNAME DIALOG
   // ===========================
-  void showEditEmailDialog(BuildContext context) {
-    final emailController = TextEditingController(text: userEmail.value);
+  void showEditUsernameDialog(BuildContext context) {
+    final usernameController = TextEditingController(text: userName.value);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Email'),
+        title: const AppText(data: 'Edit User Name', fontSize: 16, fontWeight: FontWeight.w600),
         content: TextField(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
+          controller: usernameController,
           decoration: const InputDecoration(
-            labelText: 'Email',
+            labelText: 'User Name',
             border: OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: const AppText(data: 'Cancel', fontSize: 14),
           ),
           Obx(() => ElevatedButton(
             onPressed: isUpdating.value
                 ? null
-                : () => _updateEmail(ctx, emailController.text.trim()),
+                : () => _updateUsername(ctx, usernameController.text.trim()),
             child: isUpdating.value
                 ? const SizedBox(
-              height: 16,
-              width: 16,
+              height: 16, width: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-                : const Text('Save'),
+                : const AppText(data: 'Save', fontSize: 14),
           )),
         ],
       ),
     );
   }
 
-  Future<void> _updateEmail(BuildContext ctx, String newEmail) async {
-    if (newEmail.isEmpty || newEmail == userEmail.value) {
+  Future<void> _updateUsername(BuildContext ctx, String newValue) async {
+    if (newValue.isEmpty || newValue == userName.value) {
       Navigator.pop(ctx);
       return;
     }
-
     isUpdating.value = true;
     try {
-      // ApiServices.patch() → sends jsonEncode(body) automatically
-      await apiServices.patch(
+      await apiServices.put(
         '/api/users/profile/',
         headers: {'Authorization': 'Bearer $token'},
-        body: {'email': newEmail},
+        body: {'username': newValue},
       );
-      userEmail.value = newEmail;
+      userName.value = newValue;
       Navigator.pop(ctx);
-      _showSuccess('Email updated successfully');
+      _showSuccess('Username updated successfully');
     } on HttpException catch (e) {
-      print('UpdateEmail Error ${e.statusCode}: ${e.body}');
       _showError(_parseError(e));
     } finally {
       isUpdating.value = false;
@@ -170,19 +152,21 @@ class ProfileController extends GetxController {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This cannot be undone.',
+        title: const AppText(data: 'Delete Account', fontSize: 16, fontWeight: FontWeight.w600),
+        content: const AppText(
+          data: 'Are you sure you want to delete your account? This cannot be undone.',
+          fontSize: 14,
+          color: Colors.black54,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: const AppText(data: 'Cancel', fontSize: 14),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: const AppText(data: 'Delete', fontSize: 14, color: Colors.red),
           ),
         ],
       ),
@@ -192,7 +176,6 @@ class ProfileController extends GetxController {
 
     isDeleting.value = true;
     try {
-      // ApiServices.delete() → no body needed for profile delete
       await apiServices.delete(
         '/api/users/profile/',
         headers: {'Authorization': 'Bearer $token'},
@@ -200,7 +183,6 @@ class ProfileController extends GetxController {
       await StorageService.logout();
       AppNavigation.pushAndClear(SigninPage());
     } on HttpException catch (e) {
-      print('DeleteProfile Error ${e.statusCode}: ${e.body}');
       _showError(_parseError(e));
     } finally {
       isDeleting.value = false;
@@ -213,17 +195,17 @@ class ProfileController extends GetxController {
   Future<void> logout() async {
     final confirm = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
+        title: const AppText(data: 'Log Out', fontSize: 16, fontWeight: FontWeight.w600),
+        content: const AppText(data: 'Are you sure you want to log out?', fontSize: 14),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: const AppText(data: 'Cancel', fontSize: 14),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Log Out'),
+            child: const AppText(data: 'Log Out', fontSize: 14, color: Colors.red),
           ),
         ],
       ),

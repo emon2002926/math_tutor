@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_project/authpage/resetpassword.dart';
 import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/images.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
