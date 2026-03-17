@@ -1,19 +1,27 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../authpage/signin_page.dart';
+import '../../core/utils/api_service.dart';
+import '../../core/utils/app_navigation.dart';
+import '../../core/widgets/custom_snackbar.dart';
+
 
 class ResetPasswordController extends GetxController {
-  final String email;
+  final String resetToken;
 
-  ResetPasswordController({required this.email});
+  ResetPasswordController({required this.resetToken});
 
-  final passwordController = TextEditingController();
+  final apiServices = Get.find<ApiServices>();
+
+  final passwordController       = TextEditingController();
   final retypePasswordController = TextEditingController();
 
-  // Observable states
-  final isLoading = false.obs;
-  final isPasswordVisible = false.obs;
-  final isRetypePasswordVisible = false.obs;
+  final isLoading                = false.obs;
+  final isPasswordVisible        = false.obs;
+  final isRetypePasswordVisible  = false.obs;
 
   @override
   void onClose() {
@@ -22,82 +30,60 @@ class ResetPasswordController extends GetxController {
     super.onClose();
   }
 
-  void togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
-  }
+  void togglePasswordVisibility()       => isPasswordVisible.value = !isPasswordVisible.value;
+  void toggleRetypePasswordVisibility() => isRetypePasswordVisible.value = !isRetypePasswordVisible.value;
 
-  void toggleRetypePasswordVisibility() {
-    isRetypePasswordVisible.value = !isRetypePasswordVisible.value;
+  void _showError(String message)   => CustomSnackBar.error(message);
+  void _showSuccess(String message) => CustomSnackBar.success(message);
+
+  String _parseError(HttpException e) {
+    try {
+      final decoded = jsonDecode(e.body ?? '{}') as Map<String, dynamic>;
+      return decoded['detail'] ??
+          decoded['message']   ??
+          decoded['error']     ??
+          'Something went wrong (${e.statusCode})';
+    } catch (_) {
+      return 'Something went wrong (${e.statusCode})';
+    }
   }
 
   Future<void> resetPassword() async {
-    final password = passwordController.text;
-    final retypePassword = retypePasswordController.text;
+    final password       = passwordController.text.trim();
+    final retypePassword = retypePasswordController.text.trim();
 
-    // Validation
     if (password.isEmpty || retypePassword.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please fill in all fields",
-      );
+      _showError('Please fill in all fields');
       return;
     }
-
     if (password.length < 6) {
-      Get.snackbar(
-        "Error",
-        "Password must be at least 6 characters",
-      );
+      _showError('Password must be at least 6 characters');
       return;
     }
-
     if (password != retypePassword) {
-      Get.snackbar(
-        "Error",
-        "Passwords do not match",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Passwords do not match');
       return;
     }
 
     isLoading.value = true;
-
-  //   try {
-  //     final result = await AuthService().resetPassword(
-  //       new_password: passwordController.text,
-  //       confirm_password: retypePasswordController.text,
-  //     );
-  //
-  //     if (result["status"] == 200) {
-  //       Get.snackbar(
-  //         "Success",
-  //         "Password reset successful",
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.green.shade100,
-  //         colorText: Colors.green.shade900,
-  //       );
-  //       Get.offAll(() => SigninPage());
-  //     } else {
-  //       Get.snackbar(
-  //         "Error",
-  //         result["data"] ?? "Reset failed",
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.red.shade100,
-  //         colorText: Colors.red.shade900,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     Get.snackbar(
-  //       "Error",
-  //       "Something went wrong. Please try again.",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.red.shade100,
-  //       colorText: Colors.red.shade900,
-  //     );
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-   }
+    try {
+      await apiServices.post(
+        '/api/users/password-reset/confirm/',
+        body: {
+          'reset_token':      resetToken,
+          'new_password':     password,
+          'password_confirm': retypePassword,
+        },
+      );
+      // No exception = 200 OK
+      _showSuccess('Password reset successful');
+      AppNavigation.pushAndClear(SignInPage());
+    } on HttpException catch (e) {
+      _showError(_parseError(e));
+    } catch (e) {
+      _showError('Something went wrong. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

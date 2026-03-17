@@ -3,52 +3,52 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controller/authController/signincontroller.dart';
+import '../core/app_text.dart';
 import '../images.dart';
 
 
-class SigninPage extends StatelessWidget {
-  const SigninPage({super.key});
+class SignInPage extends StatelessWidget {
+  const SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Controller initialize — GetX lazy load করবে
-    final controller = Get.put(SigninController());
+    final controller = Get.put(SignInController());
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Logo
-              Image.asset(
-                AppImages.Toplogo,
-                height: 180.h,
-                width: 140.w,
+              Center(
+                child: Image.asset(
+                  AppImages.Toplogo,
+                  height: 180.h,
+                  width: 140.w,
+                ),
               ),
 
               SizedBox(height: 8.h),
 
               // Title
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Sign In",
-                  style: GoogleFonts.montserrat(
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              AppText(
+                data: "Sign In",
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
 
-              SizedBox(height: 12.h),
+              SizedBox(height: 20.h),
 
+              // Username
               _inputField("Username", controller.usernameController),
+
+              // Email
               _inputField("Email", controller.emailController),
 
-              // Password field — visibility toggle এর জন্য Obx দরকার
+              // Password
               Obx(() => _inputField(
                 "Password",
                 controller.passwordController,
@@ -58,33 +58,34 @@ class SigninPage extends StatelessWidget {
                     controller.isPasswordVisible.value
                         ? Icons.visibility
                         : Icons.visibility_off,
+                    color: Colors.grey,
                   ),
                   onPressed: controller.togglePasswordVisibility,
                 ),
               )),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 8.h),
 
               // Forgot Password
-              TextButton(
-                onPressed: controller.goToForgotPassword,
-                child: Text(
-                  "Forgot password",
-                  style: TextStyle(
-                    fontSize: 18.sp,
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: controller.goToForgotPassword,
+                  child: const AppText(
+                    data: "Forgot password?",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Colors.black,
-                    fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
 
-              SizedBox(height: 15.h),
+              SizedBox(height: 12.h),
 
               // Sign In Button
               SizedBox(
                 width: double.infinity,
-                height: 40.h,
+                height: 50,
                 child: Obx(() => ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F2A44),
@@ -92,42 +93,43 @@ class SigninPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed:
-                  controller.isLoading.value ? null : controller.login,
+                  onPressed: controller.isLoading.value ? null : controller.login,
                   child: controller.isLoading.value
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
+                    height: 20, width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
-                      : Text(
-                    "Sign in",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                    ),
+                      : const AppText(
+                    data: "Sign In",
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 )),
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 20.h),
 
               // Divider
               Row(
-                children: const [
-                  Expanded(child: Divider()),
+                children: [
+                  const Expanded(child: Divider()),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("or"),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: AppText(
+                      data: "or",
+                      fontSize: 13,
+                      color: Colors.grey,
+                    ),
                   ),
-                  Expanded(child: Divider()),
+                  const Expanded(child: Divider()),
                 ],
               ),
 
-              SizedBox(height: 15.h),
+              SizedBox(height: 20.h),
 
               // Social Buttons
               Row(
@@ -138,21 +140,24 @@ class SigninPage extends StatelessWidget {
                 ],
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 16.h),
 
               // Sign Up redirect
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account? "),
-                  TextButton(
-                    onPressed: controller.goToSignUp,
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                  const AppText(
+                    data: "Don't have an account? ",
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                  GestureDetector(
+                    onTap: controller.goToSignUp,
+                    child: const AppText(
+                      data: "Sign Up",
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ],
@@ -164,7 +169,6 @@ class SigninPage extends StatelessWidget {
     );
   }
 
-  // Input Field Widget
   Widget _inputField(
       String hint,
       TextEditingController controller, {
@@ -178,6 +182,7 @@ class SigninPage extends StatelessWidget {
         obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
           suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.grey.shade100,
@@ -187,12 +192,19 @@ class SigninPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
           ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Color(0xFF1F2A44), width: 1.5),
+          ),
         ),
       ),
     );
   }
 
-  // Social Button
   Widget _socialButton(IconData icon) {
     return Expanded(
       child: Container(
@@ -201,7 +213,7 @@ class SigninPage extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Icon(icon, size: 28),
+        child: Icon(icon, size: 28, color: Colors.black87),
       ),
     );
   }

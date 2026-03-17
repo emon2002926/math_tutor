@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/authpage/singupOtppage.dart';
 import 'package:get/get.dart';
 import 'package:flutter_project/services/auth_service.dart';
 
@@ -44,7 +45,7 @@ class ForgotPasswordController extends GetxController {
           backgroundColor: Colors.green.shade100,
           colorText: Colors.green.shade900,
         );
-        Get.to(() => Forgototppage(email: email));
+        Get.to(() => OtpPage(email: email));
       } else {
         Get.snackbar(
           "Error",

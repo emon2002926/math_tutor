@@ -181,7 +181,7 @@ class ProfileController extends GetxController {
         headers: {'Authorization': 'Bearer $token'},
       );
       await StorageService.logout();
-      AppNavigation.pushAndClear(SigninPage());
+      AppNavigation.pushAndClear(SignInPage());
     } on HttpException catch (e) {
       _showError(_parseError(e));
     } finally {
@@ -214,6 +214,6 @@ class ProfileController extends GetxController {
     if (confirm != true) return;
 
     await StorageService.logout();
-    AppNavigation.pushAndClear(SigninPage());
+    AppNavigation.pushAndClear(SignInPage());
   }
 }

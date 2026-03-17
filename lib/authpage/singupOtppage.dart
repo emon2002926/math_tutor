@@ -4,144 +4,156 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../controller/authController/singupOtpController.dart';
+import '../core/app_text.dart';
 import '../images.dart';
 
 
-class Otppage extends StatelessWidget {
+class OtpPage extends StatelessWidget {
   final String email;
+  final OtpMode mode;
 
-  const Otppage({super.key, required this.email});
+  const OtpPage({
+    super.key,
+    required this.email,
+    this.mode = OtpMode.register,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // email pass করে controller initialize
-    final controller = Get.put(OtpController(email: email));
+    final controller = Get.put(OtpController(email: email, mode: mode));
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 22.h),
-
-                // Logo
-                Image.asset(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Logo
+              Center(
+                child: Image.asset(
                   AppImages.Toplogo,
-                  height: 200.h,
-                  width: 200.w,
+                  height: 180.h,
+                  width: 140.w,
                 ),
+              ),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-                // Title
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Enter OTP",
-                    style: GoogleFonts.montserrat(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+              // Title
+              const AppText(
+                data: "Enter OTP",
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+
+              SizedBox(height: 8.h),
+
+              // Subtitle
+              AppText(
+                data: "We sent a verification code to $email",
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+
+              SizedBox(height: 24.h),
+
+              // OTP Input
+              TextField(
+                controller: controller.otpController,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                textAlign: TextAlign.start,
+                style: const TextStyle(fontSize: 20, letterSpacing: 4),
+                decoration: InputDecoration(
+                  hintText: "Enter 6-digit OTP",
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 14,
+                    letterSpacing: 0,
+                  ),
+                  counterText: "",
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                        color: Color(0xFF1F2A44), width: 1.5),
                   ),
                 ),
+              ),
 
-                SizedBox(height: 10.h),
+              SizedBox(height: 16.h),
 
-                // OTP Input Field
-                _otpSingleField(controller),
-
-                SizedBox(height: 180.h),
-
-                // Timer & Resend section
-                Column(
-                  children: [
-                    const Text(
-                      "We sent a verification code to your email. Please check.",
-                      textAlign: TextAlign.center,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("If not, resend in "),
-
-                        // Timer — Obx দিয়ে reactive
-                        Obx(() => Text(
-                          "0:${controller.seconds.value.toString().padLeft(2, '0')} ",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        )),
-
-                        // Resend button — canResend অনুযায়ী enable/disable
-                        Obx(() => TextButton(
-                          onPressed: controller.canResend.value
-                              ? controller.resendOtp
-                              : null,
-                          child: const Text("Resend"),
-                        )),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // Confirm Button
-                SizedBox(
-                  width: double.infinity,
-                  child: Obx(() => ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1F2A44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+              // Timer & Resend
+              Obx(() => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppText(
+                    data: controller.canResend.value
+                        ? "Didn't receive the code? "
+                        : "Resend in  0:${controller.seconds.value.toString().padLeft(2, '0')}  ",
+                    fontSize: 13,
+                    color: Colors.black54,
+                  ),
+                  if (controller.canResend.value)
+                    GestureDetector(
+                      onTap: controller.resendOtp,
+                      child: const AppText(
+                        data: "Resend",
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1F2A44),
                       ),
                     ),
-                    onPressed: controller.isLoading.value
-                        ? null
-                        : () => controller.verifyOtp(context),
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : Text(
-                      "Submit",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                      ),
+                ],
+              )),
+
+              SizedBox(height: 32.h),
+
+              // Submit Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: Obx(() => ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1F2A44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                  )),
-                ),
-              ],
-            ),
+                  ),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () => controller.verifyOtp(context),
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                    height: 20, width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : const AppText(
+                    data: "Submit",
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )),
+              ),
+            ],
           ),
-        ),
-      ),
-    );
-  }
-
-  // OTP Input Field Widget
-  Widget _otpSingleField(OtpController controller) {
-    return TextField(
-      controller: controller.otpController,
-      keyboardType: TextInputType.number,
-      maxLength: 6,
-      textAlign: TextAlign.start,
-      style: TextStyle(fontSize: 20.sp),
-      decoration: InputDecoration(
-        hintText: "Enter 6 digit OTP",
-        counterText: "",
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        contentPadding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 12.w),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
         ),
       ),
     );

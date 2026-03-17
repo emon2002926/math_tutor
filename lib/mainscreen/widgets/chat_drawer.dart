@@ -112,7 +112,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   ? ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  AppNavigation.pushAndClear(SigninPage());
+                  AppNavigation.pushAndClear(SignInPage());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1F2A44),
@@ -133,7 +133,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      AppNavigation.push(SigninPage());
+                      AppNavigation.push(SignInPage());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1F2A44),

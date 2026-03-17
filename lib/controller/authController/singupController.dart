@@ -4,17 +4,17 @@ import 'package:flutter_project/authpage/singupOtppage.dart';
 import 'package:flutter_project/authpage/signin_page.dart';
 import 'package:flutter_project/services/auth_service.dart';
 
+import '../../core/widgets/custom_snackbar.dart';
+
 class SignUpController extends GetxController {
-  // TextEditingControllers
-  final usernameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final usernameController        = TextEditingController();
+  final emailController           = TextEditingController();
+  final passwordController        = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // Observable states
-  final isLoading = false.obs;
-  final isPasswordVisible = false.obs;
-  final isConfirmPasswordVisible = false.obs;
+  final isLoading                  = false.obs;
+  final isPasswordVisible          = false.obs;
+  final isConfirmPasswordVisible   = false.obs;
 
   @override
   void onClose() {
@@ -25,83 +25,59 @@ class SignUpController extends GetxController {
     super.onClose();
   }
 
-  void togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
-  }
+  void togglePasswordVisibility()        => isPasswordVisible.value = !isPasswordVisible.value;
+  void toggleConfirmPasswordVisibility() => isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
+  void goToSignIn()                      => Get.to(() => SignInPage());
 
-  void toggleConfirmPasswordVisibility() {
-    isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
-  }
+  void _showError(String message)   => CustomSnackBar.error(message);
+  void _showSuccess(String message) => CustomSnackBar.success(message);
 
-  void goToSignIn() {
-    Get.to(() => SigninPage());
+  // Parse field-level errors from API e.g. {"email": ["already exists"], "username": ["taken"]}
+  String _parseError(dynamic data) {
+    if (data is Map) {
+      final messages = <String>[];
+      data.forEach((key, value) {
+        if (value is List) messages.add('$key: ${value.join(', ')}');
+        else messages.add('$key: $value');
+      });
+      return messages.join('\n');
+    }
+    return data.toString();
   }
 
   Future<void> signUp() async {
-    final username = usernameController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    final username        = usernameController.text.trim();
+    final email           = emailController.text.trim();
+    final password        = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
-    // Basic validation
     if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please fill in all fields",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Please fill in all fields');
       return;
     }
 
     if (password != confirmPassword) {
-      Get.snackbar(
-        "Error",
-        "Passwords do not match",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Passwords do not match');
       return;
     }
 
     isLoading.value = true;
-
     try {
       final result = await AuthService.registerUser(
         email: email,
         username: username,
         password: password,
-        confirmPassword: confirmPassword,
+        confirmPassword: confirmPassword, // sent as 'password_confirm' inside AuthService
       );
-      print(email+username+password+confirmPassword);
-      if (result["status"] == 201) {
-        Get.snackbar(
-          "Success",
-          result["data"]["message"],
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade100,
-          colorText: Colors.green.shade900,
-        );
-        Get.to(() => Otppage(email: email));
+
+      if (result['status'] == 201) {
+        _showSuccess(result['data']['message'] ?? 'Registration successful');
+        Get.to(() => OtpPage(email: email));
       } else {
-        Get.snackbar(
-          "Error",
-          result["data"].toString(),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade100,
-          colorText: Colors.red.shade900,
-        );
+        _showError(_parseError(result['data']));
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
     }

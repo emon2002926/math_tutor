@@ -4,16 +4,15 @@ import 'package:flutter_project/authpage/signup_page.dart';
 import 'package:flutter_project/authpage/forgotpassword_page.dart';
 import 'package:flutter_project/services/auth_service.dart';
 
+import '../../core/widgets/custom_snackbar.dart';
 import '../../mainscreen/chat_page.dart';
 
-class SigninController extends GetxController {
-  // TextEditingControllers
-  final emailController = TextEditingController();
+class SignInController extends GetxController {
+  final emailController    = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // Observable states
-  final isLoading = false.obs;
+  final isLoading         = false.obs;
   final isPasswordVisible = false.obs;
 
   @override
@@ -24,41 +23,29 @@ class SigninController extends GetxController {
     super.onClose();
   }
 
-  // Password visibility toggle
-  void togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
-  }
+  void togglePasswordVisibility() =>
+      isPasswordVisible.value = !isPasswordVisible.value;
 
-  // Navigate to Forgot Password
-  void goToForgotPassword() {
-    Get.to(() => ForgotpasswordPage());
-  }
+  void goToForgotPassword() => Get.to(() => ForgotpasswordPage());
+  void goToSignUp()         => Get.to(() => SignUpPage());
 
-  // Navigate to Sign Up
-  void goToSignUp() {
-    Get.to(() => SignUpPage());
-  }
+  void _showError(String message)   => CustomSnackBar.error(message);
 
-  // Login Function
+
+  void _showSuccess(String message) => CustomSnackBar.success(message);
+
+
   Future<void> login() async {
-    final email = emailController.text.trim();
+    final email    = emailController.text.trim();
     final username = usernameController.text.trim();
     final password = passwordController.text.trim();
 
-    // Basic validation
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please fill in all fields",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Please fill in all fields');
       return;
     }
 
     isLoading.value = true;
-
     try {
       final loginResult = await AuthService().loginUser(
         username: username,
@@ -66,37 +53,14 @@ class SigninController extends GetxController {
         password: password,
       );
 
-
-      print("asdf: $email");
-      print("asdf: $username");
-      print("asdf: $password");
-      if (loginResult["success"]) {
-        Get.snackbar(
-          "Success",
-          "Login Successful",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade100,
-          colorText: Colors.green.shade900,
-        );
-        // Get.off(() => Otppage(email: email));
+      if (loginResult['success']) {
+        _showSuccess('Login Successful');
         Get.off(() => ChatPage());
       } else {
-        Get.snackbar(
-          "Error",
-          loginResult["data"].toString(),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade100,
-          colorText: Colors.red.shade900,
-        );
+        _showError(loginResult['data'].toString());
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Something went wrong. Please try again.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      _showError('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;
     }
