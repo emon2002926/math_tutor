@@ -24,8 +24,11 @@ class MathText extends StatelessWidget {
   List<InlineSpan> _buildSpans(String text) {
     final List<InlineSpan> spans = [];
 
-    // Matches \(...\) for inline math and \[...\] for block math
-    final regex = RegExp(r'\\\((.+?)\\\)|\\\[(.+?)\\\]', dotAll: true);
+    // Matches $$...$$, \[...\], $...$, \(...\)  — order matters!
+    final regex = RegExp(
+      r'\$\$(.+?)\$\$|\\\[(.+?)\\\]|\$(.+?)\$|\\\((.+?)\\\)',
+      dotAll: true,
+    );
     int lastEnd = 0;
 
     for (final match in regex.allMatches(text)) {
@@ -37,9 +40,10 @@ class MathText extends StatelessWidget {
         ));
       }
 
-      // LaTeX content (group 1 = inline, group 2 = block)
-      final latex = match.group(1) ?? match.group(2) ?? '';
-      final isBlock = match.group(2) != null;
+      // group(1) = $$...$$  group(2) = \[...\]  group(3) = $...$  group(4) = \(...\)
+      final latex = match.group(1) ?? match.group(2) ??
+          match.group(3) ?? match.group(4) ?? '';
+      final isBlock = match.group(1) != null || match.group(2) != null;
 
       spans.add(WidgetSpan(
         alignment: PlaceholderAlignment.middle,
@@ -62,7 +66,7 @@ class MathText extends StatelessWidget {
       lastEnd = match.end;
     }
 
-    // Remaining plain text
+    // Remaining plain text after last match
     if (lastEnd < text.length) {
       spans.add(TextSpan(
         text: text.substring(lastEnd),

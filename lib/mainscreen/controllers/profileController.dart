@@ -94,18 +94,22 @@ class ProfileController extends GetxController {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const AppText(data: 'Edit User Name', fontSize: 16, fontWeight: FontWeight.w600),
+        title: AppText(
+          data: 'edit_username'.tr,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
         content: TextField(
           controller: usernameController,
-          decoration: const InputDecoration(
-            labelText: 'User Name',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: 'username'.tr,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const AppText(data: 'Cancel', fontSize: 14),
+            child: AppText(data: 'cancel'.tr, fontSize: 14),
           ),
           Obx(() => ElevatedButton(
             onPressed: isUpdating.value
@@ -113,16 +117,16 @@ class ProfileController extends GetxController {
                 : () => _updateUsername(ctx, usernameController.text.trim()),
             child: isUpdating.value
                 ? const SizedBox(
-              height: 16, width: 16,
+              height: 16,
+              width: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-                : const AppText(data: 'Save', fontSize: 14),
+                : AppText(data: 'save'.tr, fontSize: 14),
           )),
         ],
       ),
     );
   }
-
   Future<void> _updateUsername(BuildContext ctx, String newValue) async {
     if (newValue.isEmpty || newValue == userName.value) {
       Navigator.pop(ctx);

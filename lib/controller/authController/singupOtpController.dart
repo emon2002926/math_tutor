@@ -7,7 +7,7 @@ import 'package:flutter_project/services/auth_service.dart';
 import 'package:flutter_project/images.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../authpage/resetpassword.dart';
+import '../../authpage/resetpassword_page_email.dart';
 import '../../core/app_text.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/utils/app_navigation.dart';

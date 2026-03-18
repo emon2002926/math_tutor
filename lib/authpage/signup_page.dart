@@ -34,8 +34,8 @@ class SignUpPage extends StatelessWidget {
               SizedBox(height: 8.h),
 
               // Title
-              const AppText(
-                data: "Sign Up",
+              AppText(
+                data: 'sign_up'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -43,14 +43,14 @@ class SignUpPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Username
-              _inputField("Username", controller.usernameController),
+              _inputField('username'.tr, controller.usernameController),
 
               // Email
-              _inputField("Email", controller.emailController),
+              _inputField('email'.tr, controller.emailController),
 
               // Password
               Obx(() => _inputField(
-                "Password",
+                'password'.tr,
                 controller.passwordController,
                 isPassword: !controller.isPasswordVisible.value,
                 suffixIcon: IconButton(
@@ -66,7 +66,7 @@ class SignUpPage extends StatelessWidget {
 
               // Confirm Password
               Obx(() => _inputField(
-                "Confirm Password",
+                'confirm_password'.tr,
                 controller.confirmPasswordController,
                 isPassword: !controller.isConfirmPasswordVisible.value,
                 suffixIcon: IconButton(
@@ -93,17 +93,20 @@ class SignUpPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: controller.isLoading.value ? null : controller.signUp,
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : controller.signUp,
                   child: controller.isLoading.value
                       ? const SizedBox(
-                    height: 20, width: 20,
+                    height: 20,
+                    width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
-                      : const AppText(
-                    data: "Sign Up",
+                      : AppText(
+                    data: 'sign_up'.tr,
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -120,7 +123,7 @@ class SignUpPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: AppText(
-                      data: "or",
+                      data: 'or'.tr,
                       fontSize: 13,
                       color: Colors.grey,
                     ),
@@ -146,15 +149,15 @@ class SignUpPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppText(
-                    data: "Already have an account? ",
+                  AppText(
+                    data: 'already_have_account'.tr,
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                   GestureDetector(
                     onTap: controller.goToSignIn,
-                    child: const AppText(
-                      data: "Sign In",
+                    child: AppText(
+                      data: 'sign_in'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,

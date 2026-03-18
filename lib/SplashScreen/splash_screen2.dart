@@ -29,17 +29,17 @@ class SplashScreen2 extends StatelessWidget {
                     width: 380,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Ask. Snap. Learn.✨",
-                    style: TextStyle(
+                  Text(
+                    'splash_tagline'.tr,
+                    style: const TextStyle(
                       fontSize: 24,
                       color: Color(0xFF2B3A5D),
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    "Type or snap a photo of your math problem and let your AI tutor do the rest",
-                    style: TextStyle(
+                  Text(
+                    'splash_description'.tr,
+                    style: const TextStyle(
                       fontSize: 17,
                       color: Color(0xFF2B3A5D),
                     ),
@@ -63,10 +63,10 @@ class SplashScreen2 extends StatelessWidget {
                         ),
                         elevation: WidgetStateProperty.all(10),
                       ),
-                      child: const Text(
-                        "Continue",
+                      child: Text(
+                        'continue'.tr,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ),

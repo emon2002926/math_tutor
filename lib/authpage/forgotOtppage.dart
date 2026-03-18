@@ -7,14 +7,13 @@
 // import '../images.dart';
 //
 //
-// class Forgototppage extends StatelessWidget {
+// class ForgotOtpPage extends StatelessWidget {
 //   final String email;
 //
-//   const Forgototppage({super.key, required this.email});
+//   const ForgotOtpPage({super.key, required this.email});
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     // email pass করে controller initialize
 //     final controller = Get.put(Forgototpcontroller(email: email));
 //
 //     return Scaffold(
@@ -51,12 +50,10 @@
 //
 //                 SizedBox(height: 10.h),
 //
-//                 // OTP Input Field
 //                 _otpSingleField(controller),
 //
 //                 SizedBox(height: 180.h),
 //
-//                 // Timer & Resend section
 //                 Column(
 //                   children: [
 //                     const Text(
@@ -68,13 +65,11 @@
 //                       children: [
 //                         const Text("If not, resend in "),
 //
-//                         // Timer — Obx দিয়ে reactive
 //                         Obx(() => Text(
 //                           "0:${controller.seconds.value.toString().padLeft(2, '0')} ",
 //                           style: const TextStyle(fontWeight: FontWeight.bold),
 //                         )),
 //
-//                         // Resend button — canResend অনুযায়ী enable/disable
 //                         Obx(() => TextButton(
 //                           onPressed: controller.canResend.value
 //                               ? controller.resendOtp

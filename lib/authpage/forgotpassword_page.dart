@@ -6,8 +6,8 @@ import '../controller/authController/forgotpasswordController.dart';
 import '../images.dart';
 
 
-class ForgotpasswordPage extends StatelessWidget {
-  const ForgotpasswordPage({super.key});
+class ForgotPasswordPage extends StatelessWidget {
+  const ForgotPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,82 +16,77 @@ class ForgotpasswordPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 22.h),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 22.h),
 
-                // Logo
-                Image.asset(
-                  AppImages.Toplogo,
-                  height: 200,
-                  width: 200,
-                ),
+              // Logo
+              Image.asset(AppImages.Toplogo, height: 200, width: 200),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-                // Title
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Forgot Password",
-                    style: GoogleFonts.montserrat(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+              // Title
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'forgot_password_title'.tr,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
 
-                SizedBox(height: 10.h),
+              SizedBox(height: 10.h),
 
-                // Email Input
-                _inputField("Email", controller: controller.emailController),
+              // Email Input
+              _inputField('email'.tr, controller: controller.emailController),
 
-                SizedBox(height: 280.h),
+              const Spacer(),
 
-                // Send OTP Button
-                SizedBox(
-                  width: double.infinity,
-                  child: Obx(() => ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1F2A44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+              // Send OTP Button
+              SizedBox(
+                width: double.infinity,
+                child: Obx(() => ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1F2A44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    onPressed: controller.isLoading.value
-                        ? null
-                        : controller.sendOtp,
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : Text(
-                      "Sent OTP",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                      ),
+                  ),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : controller.sendOtp,
+                  child: controller.isLoading.value
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
                     ),
-                  )),
-                ),
-              ],
-            ),
+                  )
+                      : Text(
+                    'send_otp'.tr,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                )),
+              ),
+
+              SizedBox(height: 16.h),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // Input Field Widget
   Widget _inputField(
       String hint, {
         bool isPassword = false,
@@ -105,7 +100,8 @@ class ForgotpasswordPage extends StatelessWidget {
         suffixIcon: isPassword ? const Icon(Icons.visibility_off) : null,
         filled: true,
         fillColor: Colors.grey.shade100,
-        contentPadding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 16.w),
+        contentPadding:
+        EdgeInsets.symmetric(horizontal: 20.h, vertical: 16.w),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,

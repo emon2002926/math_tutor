@@ -3,8 +3,13 @@ import 'package:get/get.dart';
 
 import '../controller/TearmController/tearmController.dart';
 
-class Termsconditionpage extends StatelessWidget {
-  const Termsconditionpage({super.key});
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../controller/TearmController/tearmController.dart';
+
+class TermsConditionPage extends StatelessWidget {
+  const TermsConditionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +23,9 @@ class Termsconditionpage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Terms and Privacy Policy",
-          style: TextStyle(
+        title: Text(
+          'terms_privacy'.tr,
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -40,11 +45,11 @@ class Termsconditionpage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Failed to load content'),
+                Text('failed_to_load'.tr),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: controller.fetchTerms,
-                  child: const Text('Retry'),
+                  child: Text('retry'.tr),
                 ),
               ],
             ),
@@ -79,4 +84,3 @@ class Termsconditionpage extends StatelessWidget {
     );
   }
 }
-

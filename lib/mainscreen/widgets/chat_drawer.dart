@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/core/utils/storege_service.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import '../../authpage/signin_page.dart';
 import '../../core/app_text.dart';
 import '../../core/utils/app_navigation.dart';
@@ -52,7 +54,11 @@ class _ChatDrawerState extends State<ChatDrawer> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
                 icon: const Icon(Icons.edit_square, size: 18, color: Colors.white),
-                label: const AppText(data: "New chat", color: Colors.white, fontSize: 15),
+                label: AppText(
+                  data: 'new_chat'.tr,
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
               ),
             ),
 
@@ -61,30 +67,36 @@ class _ChatDrawerState extends State<ChatDrawer> {
 
             // ── Profile ──────────────────────────
             ListTile(
-              title: const AppText(data: "Profile"),
-              onTap: () => AppNavigation.push(Profile()),
+              title: AppText(data: 'profile'.tr),
+              onTap: () => AppNavigation.push(ProfilePage()),
             ),
             const Divider(height: 1),
 
             // ── Terms ────────────────────────────
             ListTile(
-              title: const AppText(data: "Terms and privacy policy"),
+              title: AppText(data: 'terms_privacy'.tr),
               onTap: () {
                 Navigator.pop(context);
-                AppNavigation.push(Termsconditionpage());
+                AppNavigation.push(TermsConditionPage());
               },
             ),
             const Divider(height: 1),
 
             // ── History header ───────────────────
             InkWell(
-              onTap: () => setState(() => _historyExpanded = !_historyExpanded),
+              onTap: () =>
+                  setState(() => _historyExpanded = !_historyExpanded),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const AppText(data: "History", fontWeight: FontWeight.w600, fontSize: 15),
+                    AppText(
+                      data: 'history'.tr,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
                     Icon(_historyExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down),
@@ -112,6 +124,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   ? ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  StorageService.logout();
                   AppNavigation.pushAndClear(SignInPage());
                 },
                 style: ElevatedButton.styleFrom(
@@ -120,15 +133,19 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const AppText(data: "Log out", color: Colors.white),
+                child: AppText(
+                  data: 'logout'.tr,
+                  color: Colors.white,
+                ),
               )
                   : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AppText(
-                      data: "Join to save your chats",
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15),
+                  AppText(
+                    data: 'join_to_save'.tr,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () {
@@ -141,8 +158,10 @@ class _ChatDrawerState extends State<ChatDrawer> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const AppText(
-                        data: "Login or Sign up", color: Colors.white),
+                    child: AppText(
+                      data: 'login_or_signup'.tr,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -153,15 +172,14 @@ class _ChatDrawerState extends State<ChatDrawer> {
     );
   }
 
-  // Plain StatefulWidget method — no Obx needed,
-  // GetX rebuilds this via the outer setState when sessions load
   Widget _buildLoggedInHistory(ChatController controller) {
     if (controller.isLoadingSessions.value) {
       return const Center(child: CircularProgressIndicator());
     }
     if (controller.chatSessions.isEmpty) {
-      return const Center(
-          child: AppText(data: "No chats yet", color: Colors.grey));
+      return Center(
+        child: AppText(data: 'no_chats'.tr, color: Colors.grey),
+      );
     }
     return ListView.builder(
       itemCount: controller.chatSessions.length,

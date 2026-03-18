@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_project/authpage/singupOtppage.dart';
+import 'package:flutter_project/authpage/singup_otppage.dart';
 import 'package:flutter_project/authpage/signin_page.dart';
 import 'package:flutter_project/services/auth_service.dart';
 

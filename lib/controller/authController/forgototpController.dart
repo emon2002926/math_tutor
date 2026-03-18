@@ -1,10 +1,10 @@
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:flutter_project/authpage/resetpassword.dart';
-// import 'package:flutter_project/services/auth_service.dart';
-//
-//
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_project/authpage/resetpassword_page_email.dart';
+import 'package:flutter_project/services/auth_service.dart';
+
+
 // class Forgototpcontroller extends GetxController {
 //   final String email;
 //

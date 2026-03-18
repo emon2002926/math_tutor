@@ -42,17 +42,17 @@ class OtpPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Title
-              const AppText(
-                data: "Enter OTP",
+              AppText(
+                data: 'enter_otp'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
 
               SizedBox(height: 8.h),
 
-              // Subtitle
+              // Subtitle — email is dynamic, use trArgs
               AppText(
-                data: "We sent a verification code to $email",
+                data: 'otp_sent_to'.trArgs([email]),
                 fontSize: 13,
                 color: Colors.black54,
               ),
@@ -67,7 +67,7 @@ class OtpPage extends StatelessWidget {
                 textAlign: TextAlign.start,
                 style: const TextStyle(fontSize: 20, letterSpacing: 4),
                 decoration: InputDecoration(
-                  hintText: "Enter 6-digit OTP",
+                  hintText: 'otp_hint'.tr,
                   hintStyle: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 14,
@@ -102,19 +102,21 @@ class OtpPage extends StatelessWidget {
                 children: [
                   AppText(
                     data: controller.canResend.value
-                        ? "Didn't receive the code? "
-                        : "Resend in  0:${controller.seconds.value.toString().padLeft(2, '0')}  ",
+                        ? 'otp_not_received'.tr
+                        : 'otp_resend_in'.trArgs([
+                      '0:${controller.seconds.value.toString().padLeft(2, '0')}'
+                    ]),
                     fontSize: 13,
                     color: Colors.black54,
                   ),
                   if (controller.canResend.value)
                     GestureDetector(
                       onTap: controller.resendOtp,
-                      child: const AppText(
-                        data: "Resend",
+                      child: AppText(
+                        data: 'resend'.tr,
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2A44),
+                        color: const Color(0xFF1F2A44),
                       ),
                     ),
                 ],
@@ -138,14 +140,15 @@ class OtpPage extends StatelessWidget {
                       : () => controller.verifyOtp(context),
                   child: controller.isLoading.value
                       ? const SizedBox(
-                    height: 20, width: 20,
+                    height: 20,
+                    width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
-                      : const AppText(
-                    data: "Submit",
+                      : AppText(
+                    data: 'submit'.tr,
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

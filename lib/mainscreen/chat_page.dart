@@ -12,7 +12,6 @@ class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
   @override
   Widget build(BuildContext context) {
-
     final ChatController controller = Get.put(ChatController());
 
     return Scaffold(
@@ -26,7 +25,6 @@ class ChatPage extends StatelessWidget {
             onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
-
       ),
 
       drawer: ChatDrawer(controller: controller),
@@ -39,8 +37,7 @@ class ChatPage extends StatelessWidget {
 
       bottomNavigationBar: Builder(
         builder: (ctx) => Padding(
-          padding:
-          EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: _ChatInputBar(controller: controller),
         ),
       ),
@@ -70,8 +67,11 @@ class _EmptyState extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const AppText(
-              data: "What can I help with ?", fontSize: 22, fontWeight: FontWeight.bold),
+          AppText(
+            data: 'chat_empty_title'.tr,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -105,7 +105,6 @@ class _MessageListState extends State<_MessageList> {
   @override
   void initState() {
     super.initState();
-    // Auto-scroll when messages change
     ever(widget.controller.messages, (_) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     });
@@ -145,7 +144,6 @@ class _MessageListState extends State<_MessageList> {
     });
   }
 }
-
 
 class _UserBubble extends StatelessWidget {
   final ChatMessage message;
@@ -190,8 +188,7 @@ class _UserBubble extends StatelessWidget {
                 if (message.message.isNotEmpty)
                   Container(
                     constraints: BoxConstraints(
-                        maxWidth:
-                        MediaQuery.of(context).size.width * 0.72),
+                        maxWidth: MediaQuery.of(context).size.width * 0.72),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     decoration: const BoxDecoration(
@@ -216,6 +213,7 @@ class _UserBubble extends StatelessWidget {
     );
   }
 }
+
 // ── Audio Player Widget ─────────────────────────────────
 class _AudioBubble extends StatefulWidget {
   final String? localPath;
@@ -341,8 +339,7 @@ class _AudioBubbleState extends State<_AudioBubble> {
                 const SizedBox(height: 4),
                 Text(
                   '${_fmt(_position)} / ${_fmt(_duration)}',
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 10),
+                  style: const TextStyle(color: Colors.white70, fontSize: 10),
                 ),
               ],
             ),
@@ -367,8 +364,7 @@ class _AiBubble extends StatelessWidget {
           Container(
             constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.78),
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: const BorderRadius.only(
@@ -380,7 +376,7 @@ class _AiBubble extends StatelessWidget {
             ),
             child: message.isLoading
                 ? const _TypingIndicator()
-                : MathText(           // ← replaced AppText with MathText
+                : MathText(
               data: message.message,
               color: Colors.black87,
               fontSize: 15,
@@ -467,15 +463,15 @@ class _ChatInputBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
 
-            // ── Audio preview (shows after recording stops) ──
+            // ── Audio preview ──
             Obx(() {
               if (controller.selectedAudio.value == null) {
                 return const SizedBox.shrink();
               }
               return Container(
                 margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -485,11 +481,12 @@ class _ChatInputBar extends StatelessWidget {
                     const Icon(Icons.audiotrack,
                         color: Colors.white, size: 18),
                     const SizedBox(width: 8),
-                    const Expanded(
+                    Expanded(
                       child: AppText(
-                          data: 'Audio ready — tap send',
-                          color: Colors.white,
-                          fontSize: 13),
+                        data: 'audio_ready'.tr,
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
                     ),
                     GestureDetector(
                       onTap: controller.removeAudio,
@@ -501,11 +498,11 @@ class _ChatInputBar extends StatelessWidget {
               );
             }),
 
-            // ── Main input row ──────────────────────────────
+            // ── Main input row ──
             Row(
               children: [
 
-                // Mic — hold to record, tap again to stop
+                // Mic
                 Obx(() => GestureDetector(
                   onTap: controller.toggleRecording,
                   child: Container(
@@ -559,7 +556,7 @@ class _ChatInputBar extends StatelessWidget {
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => controller.sendMessage(),
                     decoration: InputDecoration(
-                      hintText: "Ask anything",
+                      hintText: 'chat_hint'.tr,
                       hintStyle: TextStyle(
                           color: Colors.grey.shade400, fontSize: 14),
                       filled: true,

@@ -26,7 +26,7 @@ class SignInController extends GetxController {
   void togglePasswordVisibility() =>
       isPasswordVisible.value = !isPasswordVisible.value;
 
-  void goToForgotPassword() => Get.to(() => ForgotpasswordPage());
+  void goToForgotPassword() => Get.to(() => ForgotPasswordPage());
   void goToSignUp()         => Get.to(() => SignUpPage());
 
   void _showError(String message)   => CustomSnackBar.error(message);
@@ -55,7 +55,7 @@ class SignInController extends GetxController {
 
       if (loginResult['success']) {
         _showSuccess('Login Successful');
-        Get.off(() => ChatPage());
+        Get.offAll(() => ChatPage());
       } else {
         _showError(loginResult['data'].toString());
       }

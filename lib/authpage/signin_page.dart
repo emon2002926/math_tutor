@@ -35,7 +35,7 @@ class SignInPage extends StatelessWidget {
 
               // Title
               AppText(
-                data: "Sign In",
+                data: 'sign_in'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -43,14 +43,14 @@ class SignInPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Username
-              _inputField("Username", controller.usernameController),
+              _inputField('username'.tr, controller.usernameController),
 
               // Email
-              _inputField("Email", controller.emailController),
+              _inputField('email'.tr, controller.emailController),
 
               // Password
               Obx(() => _inputField(
-                "Password",
+                'password'.tr,
                 controller.passwordController,
                 isPassword: !controller.isPasswordVisible.value,
                 suffixIcon: IconButton(
@@ -71,8 +71,8 @@ class SignInPage extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: controller.goToForgotPassword,
-                  child: const AppText(
-                    data: "Forgot password?",
+                  child: AppText(
+                    data: 'forgot_password'.tr,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
@@ -96,14 +96,15 @@ class SignInPage extends StatelessWidget {
                   onPressed: controller.isLoading.value ? null : controller.login,
                   child: controller.isLoading.value
                       ? const SizedBox(
-                    height: 20, width: 20,
+                    height: 20,
+                    width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
-                      : const AppText(
-                    data: "Sign In",
+                      : AppText(
+                    data: 'sign_in'.tr,
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -120,7 +121,7 @@ class SignInPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: AppText(
-                      data: "or",
+                      data: 'or'.tr,
                       fontSize: 13,
                       color: Colors.grey,
                     ),
@@ -146,15 +147,15 @@ class SignInPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppText(
-                    data: "Don't have an account? ",
+                  AppText(
+                    data: 'dont_have_account'.tr,
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                   GestureDetector(
                     onTap: controller.goToSignUp,
-                    child: const AppText(
-                      data: "Sign Up",
+                    child: AppText(
+                      data: 'sign_up'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,

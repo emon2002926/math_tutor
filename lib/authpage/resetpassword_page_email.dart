@@ -36,16 +36,16 @@ class ResetPasswordPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Title
-              const AppText(
-                data: "Reset Password",
+              AppText(
+                data: 'reset_password'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
 
               SizedBox(height: 8.h),
 
-              const AppText(
-                data: "Enter your new password below.",
+              AppText(
+                data: 'reset_password_subtitle'.tr,
                 fontSize: 13,
                 color: Colors.black54,
               ),
@@ -54,7 +54,7 @@ class ResetPasswordPage extends StatelessWidget {
 
               // New Password
               Obx(() => _inputField(
-                "New Password",
+                'new_password'.tr,
                 controller: controller.passwordController,
                 isPassword: !controller.isPasswordVisible.value,
                 suffixIcon: IconButton(
@@ -70,7 +70,7 @@ class ResetPasswordPage extends StatelessWidget {
 
               // Confirm Password
               Obx(() => _inputField(
-                "Confirm Password",
+                'confirm_password'.tr,
                 controller: controller.retypePasswordController,
                 isPassword: !controller.isRetypePasswordVisible.value,
                 suffixIcon: IconButton(
@@ -102,14 +102,15 @@ class ResetPasswordPage extends StatelessWidget {
                       : controller.resetPassword,
                   child: controller.isLoading.value
                       ? const SizedBox(
-                    height: 20, width: 20,
+                    height: 20,
+                    width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
-                      : const AppText(
-                    data: "Confirm",
+                      : AppText(
+                    data: 'confirm'.tr,
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
