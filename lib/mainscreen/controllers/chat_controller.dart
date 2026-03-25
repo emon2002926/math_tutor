@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_project/core/widgets/custom_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -17,7 +18,6 @@ class ChatController extends GetxController {
   final ImagePicker _picker = ImagePicker();
   final selectedImage = Rxn<File>();
 
-  // ── Audio recording ────────────────────────────────────
   final _audioRecorder = AudioRecorder();
   final isRecording = false.obs;
   final selectedAudio = Rxn<File>();
@@ -46,9 +46,6 @@ class ChatController extends GetxController {
     super.onClose();
   }
 
-  // ════════════════════════════════════════════════════════
-  // AUDIO RECORDING
-  // ════════════════════════════════════════════════════════
 
   Future<void> toggleRecording() async {
     if (isRecording.value) {
@@ -84,9 +81,6 @@ class ChatController extends GetxController {
 
   void removeAudio() => selectedAudio.value = null;
 
-  // ════════════════════════════════════════════════════════
-  // IMAGE
-  // ════════════════════════════════════════════════════════
 
   Future<void> pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -95,9 +89,6 @@ class ChatController extends GetxController {
 
   void removeImage() => selectedImage.value = null;
 
-  // ════════════════════════════════════════════════════════
-  // SEND MESSAGE
-  // ════════════════════════════════════════════════════════
 
   Future<void> sendMessage() async {
     final text = textController.text.trim();
@@ -231,9 +222,6 @@ class ChatController extends GetxController {
     return res.body.isEmpty ? null : jsonDecode(res.body);
   }
 
-  // ════════════════════════════════════════════════════════
-  // SESSION MANAGEMENT
-  // ════════════════════════════════════════════════════════
 
   Future<void> _createNewSession() async {
     if (!isLoggedIn) return;
@@ -292,9 +280,46 @@ class ChatController extends GetxController {
     }
   }
 
-  // ════════════════════════════════════════════════════════
-  // HELPERS
-  // ════════════════════════════════════════════════════════
+  Future<void> deleteSession(int id) async {
+    if (!isLoggedIn) return;
+    try {
+      await apiServices.delete(
+        '/api/chat/sessions/$id/',
+        headers: {'Authorization': 'Bearer $_token'},
+      );
+      chatSessions.removeWhere((s) => s['id'] == id);
+      if (sessionId.value == id) {
+        sessionId.value = null;
+        messages.clear();
+      }
+      CustomSnackBar.success('Chat deleted');
+    } on HttpException catch (e) {
+      CustomSnackBar.error(_parseError(e));
+    } catch (_) {
+      CustomSnackBar.error('Something went wrong. Please try again.');
+    }
+  }
+
+  Future<void> renameSession(int id, String newTitle) async {
+    if (!isLoggedIn) return;
+    try {
+      await apiServices.put(
+        '/api/chat/sessions/$id/',
+        headers: {'Authorization': 'Bearer $_token'},
+        body: {'title': newTitle},
+      );
+      final idx = chatSessions.indexWhere((s) => s['id'] == id);
+      if (idx != -1) {
+        chatSessions[idx] = {...chatSessions[idx], 'title': newTitle};
+      }
+      CustomSnackBar.success('Chat renamed');
+    } on HttpException catch (e) {
+      CustomSnackBar.error(_parseError(e));
+    } catch (_) {
+      CustomSnackBar.error('Something went wrong. Please try again.');
+    }
+  }
+
 
   void _replaceLoadingBubble(ChatMessage aiMsg) {
     final idx = messages.lastIndexWhere((m) => m.isLoading);
@@ -327,11 +352,5 @@ class ChatController extends GetxController {
     }
   }
 
-  void _showError(String message) {
-    Get.snackbar('Error', message,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-        margin: const EdgeInsets.all(12));
-  }
+  void _showError(String message) => CustomSnackBar.error(message);
 }

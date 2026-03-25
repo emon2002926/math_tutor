@@ -3,6 +3,7 @@ import 'package:flutter_project/mainscreen/terms&conditionpage.dart';
 import 'package:get/get.dart';
 
 import '../core/app_text.dart';
+import '../language_controller.dart';
 import 'controllers/profileController.dart';
 
 
@@ -44,27 +45,18 @@ class ProfilePage extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
-                  ),
+                  BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
                 ],
               ),
               child: Row(
                 children: [
-                  // Profile Image
                   CircleAvatar(
                     radius: 26,
                     backgroundImage: controller.userImage.value.isNotEmpty
                         ? NetworkImage(controller.userImage.value)
-                        : const NetworkImage(
-                        "https://i.pravatar.cc/150?img=3"),
+                        : const NetworkImage("https://i.pravatar.cc/150?img=3"),
                   ),
-
                   const SizedBox(width: 12),
-
-                  // Name & Email
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,56 +75,35 @@ class ProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  // 3-dot menu
                   IconButton(
                     icon: const Icon(Icons.more_vert),
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
                         shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                         ),
                         builder: (context) {
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Edit
                               ListTile(
-                                leading: const Icon(
-                                  Icons.mode_edit_outlined,
-                                  color: Colors.black,
-                                ),
-                                title: AppText(
-                                  data: 'edit'.tr,
-                                  fontSize: 15,
-                                ),
+                                leading: const Icon(Icons.mode_edit_outlined, color: Colors.black),
+                                title: AppText(data: 'edit'.tr, fontSize: 15),
                                 onTap: () {
                                   Navigator.pop(context);
                                   controller.showEditUsernameDialog(context);
                                 },
                               ),
                               const Divider(),
-
-                              // Delete
                               Obx(() => ListTile(
                                 leading: controller.isDeleting.value
                                     ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.red,
-                                  ),
+                                  height: 20, width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red),
                                 )
-                                    : const Icon(Icons.delete,
-                                    color: Colors.black),
-                                title: AppText(
-                                  data: 'delete'.tr,
-                                  fontSize: 15,
-                                ),
+                                    : const Icon(Icons.delete, color: Colors.black),
+                                title: AppText(data: 'delete'.tr, fontSize: 15),
                                 onTap: controller.isDeleting.value
                                     ? null
                                     : () {
@@ -150,28 +121,61 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
 
-            // ── Terms & Privacy ───────────────────
+            // ── Change Language ───────────────────
             const SizedBox(height: 10),
             InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TermsConditionPage()));
-              },
+              onTap: () => controller.showLanguageDialog(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+                    BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.language, color: Colors.black),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppText(
+                        data: 'change_language'.tr,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
+                    // shows current active language
+                    GetBuilder<LanguageController>(
+                      builder: (langCtrl) => AppText(
+                        data: langCtrl.langCode == 'bg' ? 'BG' : 'EN',
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Terms & Privacy ───────────────────
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => TermsConditionPage()));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
                   ],
                 ),
                 child: Row(
@@ -185,8 +189,7 @@ class ProfilePage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios,
-                        size: 18, color: Colors.black),
+                    const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),
                   ],
                 ),
               ),
@@ -197,18 +200,13 @@ class ProfilePage extends StatelessWidget {
             InkWell(
               onTap: controller.logout,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
+                    BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
                   ],
                 ),
                 child: Row(
@@ -222,8 +220,7 @@ class ProfilePage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios,
-                        size: 18, color: Colors.black),
+                    const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black),
                   ],
                 ),
               ),

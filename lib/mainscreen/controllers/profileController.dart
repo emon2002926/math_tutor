@@ -12,17 +12,17 @@ import '../../core/utils/app_navigation.dart';
 
 import 'dart:convert';
 
+import '../../language_controller.dart';
+
 class ProfileController extends GetxController {
   final apiServices = Get.find<ApiServices>();
   final String? token = StorageService.accessToken;
 
-  // ── Observable profile fields ──────────────────────────
   final profile   = Rxn<UserProfile>();
   final userName  = ''.obs;
   final userEmail = ''.obs;
   final userImage = ''.obs;
 
-  // ── Observable states ──────────────────────────────────
   final isLoading  = false.obs;
   final isUpdating = false.obs;
   final isDeleting = false.obs;
@@ -36,9 +36,7 @@ class ProfileController extends GetxController {
   String _parseError(HttpException e) {
     try {
       final decoded = jsonDecode(e.body ?? '{}') as Map<String, dynamic>;
-      return decoded['detail'] ??
-          decoded['message']   ??
-          decoded['error']     ??
+      return decoded['detail'] ?? decoded['message'] ?? decoded['error'] ??
           'Something went wrong (${e.statusCode})';
     } catch (_) {
       return 'Something went wrong (${e.statusCode})';
@@ -47,7 +45,7 @@ class ProfileController extends GetxController {
 
   void _showError(String message) {
     Get.snackbar(
-      'Error', message,
+      'error'.tr, message,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red.shade100,
       colorText: Colors.red.shade900,
@@ -57,7 +55,7 @@ class ProfileController extends GetxController {
 
   void _showSuccess(String message) {
     Get.snackbar(
-      'Success', message,
+      'success'.tr, message,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.shade100,
       colorText: Colors.green.shade900,
@@ -83,6 +81,76 @@ class ProfileController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // ===========================
+  /// CHANGE LANGUAGE DIALOG
+  // ===========================
+  void showLanguageDialog(BuildContext context) {
+    final langCtrl = LanguageController.to;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: AppText(
+          data: 'change_language'.tr,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        content: GetBuilder<LanguageController>(
+          builder: (ctrl) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // English option
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.language),
+                title: const AppText(data: 'English', fontSize: 15),
+                trailing: ctrl.langCode == 'en'
+                    ? const Icon(Icons.check_circle, color: Color(0xFF1F2A44))
+                    : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                onTap: () {
+                  langCtrl.selectLanguage('en');
+                },
+              ),
+              const Divider(height: 1),
+              // Bulgarian option
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.language),
+                title: const AppText(data: 'Български', fontSize: 15),
+                trailing: ctrl.langCode == 'bg'
+                    ? const Icon(Icons.check_circle, color: Color(0xFF1F2A44))
+                    : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                onTap: () {
+                  langCtrl.selectLanguage('bg');
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: AppText(data: 'cancel'.tr, fontSize: 14),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1F2A44),
+            ),
+            onPressed: () async {
+              await langCtrl.confirmLanguage(); // saves + applies locale
+              Navigator.pop(ctx);
+            },
+            child: AppText(
+              data: 'confirm'.tr,
+              fontSize: 14,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ===========================
@@ -117,8 +185,7 @@ class ProfileController extends GetxController {
                 : () => _updateUsername(ctx, usernameController.text.trim()),
             child: isUpdating.value
                 ? const SizedBox(
-              height: 16,
-              width: 16,
+              height: 16, width: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
                 : AppText(data: 'save'.tr, fontSize: 14),
@@ -127,6 +194,7 @@ class ProfileController extends GetxController {
       ),
     );
   }
+
   Future<void> _updateUsername(BuildContext ctx, String newValue) async {
     if (newValue.isEmpty || newValue == userName.value) {
       Navigator.pop(ctx);
@@ -141,7 +209,7 @@ class ProfileController extends GetxController {
       );
       userName.value = newValue;
       Navigator.pop(ctx);
-      _showSuccess('Username updated successfully');
+      _showSuccess('username_updated'.tr);
     } on HttpException catch (e) {
       _showError(_parseError(e));
     } finally {
@@ -156,21 +224,25 @@ class ProfileController extends GetxController {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const AppText(data: 'Delete Account', fontSize: 16, fontWeight: FontWeight.w600),
-        content: const AppText(
-          data: 'Are you sure you want to delete your account? This cannot be undone.',
+        title: AppText(
+          data: 'delete_account'.tr,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        content: AppText(
+          data: 'delete_account_confirm'.tr,
           fontSize: 14,
           color: Colors.black54,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const AppText(data: 'Cancel', fontSize: 14),
+            child: AppText(data: 'cancel'.tr, fontSize: 14),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const AppText(data: 'Delete', fontSize: 14, color: Colors.red),
+            child: AppText(data: 'delete'.tr, fontSize: 14, color: Colors.red),
           ),
         ],
       ),
@@ -199,17 +271,21 @@ class ProfileController extends GetxController {
   Future<void> logout() async {
     final confirm = await Get.dialog<bool>(
       AlertDialog(
-        title: const AppText(data: 'Log Out', fontSize: 16, fontWeight: FontWeight.w600),
-        content: const AppText(data: 'Are you sure you want to log out?', fontSize: 14),
+        title: AppText(
+          data: 'logout'.tr,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        content: AppText(data: 'logout_confirm'.tr, fontSize: 14),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const AppText(data: 'Cancel', fontSize: 14),
+            child: AppText(data: 'cancel'.tr, fontSize: 14),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const AppText(data: 'Log Out', fontSize: 14, color: Colors.red),
+            child: AppText(data: 'logout'.tr, fontSize: 14, color: Colors.red),
           ),
         ],
       ),

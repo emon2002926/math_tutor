@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import 'package:get/get.dart';
+
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
@@ -71,6 +73,10 @@ class AppTranslations extends Translations {
       'edit': 'Edit',
       'edit_username': 'Edit User Name',
       'delete': 'Delete',
+      'delete_account': 'Delete Account',
+      'delete_account_confirm': 'Are you sure you want to delete your account? This cannot be undone.',
+      'logout_confirm': 'Are you sure you want to log out?',
+      'username_updated': 'Username updated successfully',
     },
     'bg_BG': {
       // ─── Language Page ───
@@ -140,6 +146,10 @@ class AppTranslations extends Translations {
       'edit': 'Редактирай',
       'edit_username': 'Редактирай Потребителско Име',
       'delete': 'Изтрий',
+      'delete_account': 'Изтриване на акаунт',
+      'delete_account_confirm': 'Сигурни ли сте, че искате да изтриете акаунта си? Това не може да се отмени.',
+      'logout_confirm': 'Сигурни ли сте, че искате да излезете?',
+      'username_updated': 'Потребителското име е актуализирано успешно',
     },
   };
 }
