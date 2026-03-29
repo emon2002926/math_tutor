@@ -14,7 +14,7 @@ class AuthService {
   /// LOGIN USER
   /// ===========================
   Future<Map<String, dynamic>> loginUser({
-    required String username,
+    // required String username,
     required String email,
     required String password,
   }) async {
@@ -24,7 +24,7 @@ class AuthService {
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "username": username,
+        // "username": username,
         "email": email,
         "password": password,
       }),

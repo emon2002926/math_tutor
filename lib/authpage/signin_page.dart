@@ -43,7 +43,7 @@ class SignInPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Username
-              _inputField('username'.tr, controller.usernameController),
+              // _inputField('username'.tr, controller.usernameController),
 
               // Email
               _inputField('email'.tr, controller.emailController),

@@ -33,6 +33,8 @@ class ChatController extends GetxController {
   bool get isLoggedIn => StorageService.accessToken != null;
   String? get _token => StorageService.accessToken;
 
+  // ── Lifecycle ────────────────────────────────────────────────────────────
+
   @override
   void onInit() {
     super.onInit();
@@ -46,6 +48,7 @@ class ChatController extends GetxController {
     super.onClose();
   }
 
+  // ── Recording ────────────────────────────────────────────────────────────
 
   Future<void> toggleRecording() async {
     if (isRecording.value) {
@@ -81,14 +84,17 @@ class ChatController extends GetxController {
 
   void removeAudio() => selectedAudio.value = null;
 
+  // ── Image Picker ─────────────────────────────────────────────────────────
 
   Future<void> pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image =
+    await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) selectedImage.value = File(image.path);
   }
 
   void removeImage() => selectedImage.value = null;
 
+  // ── Send Message ─────────────────────────────────────────────────────────
 
   Future<void> sendMessage() async {
     final text = textController.text.trim();
@@ -125,6 +131,8 @@ class ChatController extends GetxController {
     }
   }
 
+  // ── Authenticated Send ───────────────────────────────────────────────────
+
   Future<void> _sendAuthenticated(
       String text, File? image, File? audio) async {
     if (sessionId.value == null) await _createNewSession();
@@ -151,15 +159,20 @@ class ChatController extends GetxController {
     }
 
     _replaceLocalUserMessage(
-      ChatMessage.fromJson(response['user_message'] as Map<String, dynamic>),
+      ChatMessage.fromJson(
+          response['user_message'] as Map<String, dynamic>),
     );
     _replaceLoadingBubble(
-      ChatMessage.fromJson(response['ai_response'] as Map<String, dynamic>),
+      ChatMessage.fromJson(
+          response['ai_response'] as Map<String, dynamic>),
     );
     fetchChatSessions();
   }
 
-  Future<void> _sendGuest(String text, File? image, File? audio) async {
+  // ── Guest Send ───────────────────────────────────────────────────────────
+
+  Future<void> _sendGuest(
+      String text, File? image, File? audio) async {
     const endpoint = '/api/chat/guest/';
     dynamic response;
 
@@ -184,6 +197,8 @@ class ChatController extends GetxController {
     ));
   }
 
+  // ── Multipart Upload ─────────────────────────────────────────────────────
+
   Future<dynamic> _multipartPost({
     required String endpoint,
     Map<String, String>? extraHeaders,
@@ -193,7 +208,10 @@ class ChatController extends GetxController {
   }) async {
     final url = Uri.parse('${apiServices.baseUrl}$endpoint');
     final request = http.MultipartRequest('POST', url)
-      ..headers.addAll({'Accept': 'application/json', ...?extraHeaders});
+      ..headers.addAll({
+        'Accept': 'application/json',
+        ...?extraHeaders,
+      });
 
     if (image != null) {
       request.files
@@ -222,6 +240,7 @@ class ChatController extends GetxController {
     return res.body.isEmpty ? null : jsonDecode(res.body);
   }
 
+  // ── Session Management ───────────────────────────────────────────────────
 
   Future<void> _createNewSession() async {
     if (!isLoggedIn) return;
@@ -254,8 +273,9 @@ class ChatController extends GetxController {
         headers: {'Authorization': 'Bearer $_token'},
       );
       final results = response['results'] as List<dynamic>;
-      chatSessions.value =
-          results.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      chatSessions.value = results
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
     } on HttpException catch (e) {
       _showError(_parseError(e));
     } finally {
@@ -310,7 +330,10 @@ class ChatController extends GetxController {
       );
       final idx = chatSessions.indexWhere((s) => s['id'] == id);
       if (idx != -1) {
-        chatSessions[idx] = {...chatSessions[idx], 'title': newTitle};
+        chatSessions[idx] = {
+          ...chatSessions[idx],
+          'title': newTitle,
+        };
       }
       CustomSnackBar.success('Chat renamed');
     } on HttpException catch (e) {
@@ -320,11 +343,15 @@ class ChatController extends GetxController {
     }
   }
 
+  // ── Internal Helpers ─────────────────────────────────────────────────────
 
   void _replaceLoadingBubble(ChatMessage aiMsg) {
     final idx = messages.lastIndexWhere((m) => m.isLoading);
-    if (idx != -1) messages[idx] = aiMsg;
-    else messages.add(aiMsg);
+    if (idx != -1) {
+      messages[idx] = aiMsg;
+    } else {
+      messages.add(aiMsg);
+    }
   }
 
   void _replaceLocalUserMessage(ChatMessage serverMsg) {
@@ -342,7 +369,8 @@ class ChatController extends GetxController {
 
   String _parseError(HttpException e) {
     try {
-      final decoded = jsonDecode(e.body ?? '{}') as Map<String, dynamic>;
+      final decoded =
+      jsonDecode(e.body ?? '{}') as Map<String, dynamic>;
       return decoded['detail'] ??
           decoded['message'] ??
           decoded['error'] ??

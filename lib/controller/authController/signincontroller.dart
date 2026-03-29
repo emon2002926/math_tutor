@@ -37,10 +37,10 @@ class SignInController extends GetxController {
 
   Future<void> login() async {
     final email    = emailController.text.trim();
-    final username = usernameController.text.trim();
+    // final username = usernameController.text.trim();
     final password = passwordController.text.trim();
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if ( email.isEmpty || password.isEmpty) {
       _showError('Please fill in all fields');
       return;
     }
@@ -48,7 +48,7 @@ class SignInController extends GetxController {
     isLoading.value = true;
     try {
       final loginResult = await AuthService().loginUser(
-        username: username,
+        // username: username,
         email: email,
         password: password,
       );

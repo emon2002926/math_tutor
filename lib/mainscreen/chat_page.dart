@@ -8,8 +8,54 @@ import 'dart:io';
 import '../core/widgets/math_text.dart';
 import 'models/chat_message.dart';
 
+// ── Full-screen image preview helper ──────────────────────────────────────
+void _openFullImagePreview(BuildContext context,
+    {File? file, String? url}) {
+  assert(file != null || url != null);
+  showDialog(
+    context: context,
+    barrierColor: Colors.black87,
+    builder: (_) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.zero,
+      child: Stack(
+        children: [
+          Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 5.0,
+              child: file != null
+                  ? Image.file(file)
+                  : Image.network(url!),
+            ),
+          ),
+          Positioned(
+            top: 48,
+            right: 16,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close,
+                    color: Colors.white, size: 20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// ── ChatPage ───────────────────────────────────────────────────────────────
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ChatController controller = Get.put(ChatController());
@@ -26,27 +72,25 @@ class ChatPage extends StatelessWidget {
           ),
         ),
       ),
-
       drawer: ChatDrawer(controller: controller),
-
       body: SafeArea(
         child: Obx(() => controller.messages.isEmpty
             ? const _EmptyState()
             : _MessageList(controller: controller)),
       ),
-
       bottomNavigationBar: Builder(
         builder: (ctx) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: _ChatInputBar(controller: controller),
         ),
       ),
-
       resizeToAvoidBottomInset: true,
     );
   }
 }
 
+// ── Empty State ────────────────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
@@ -61,7 +105,8 @@ class _EmptyState extends StatelessWidget {
             children: [
               Icon(Icons.auto_awesome, size: 10, color: Colors.blue.shade200),
               const SizedBox(width: 40),
-              Icon(Icons.auto_awesome, size: 14, color: Colors.yellow.shade400),
+              Icon(Icons.auto_awesome,
+                  size: 14, color: Colors.yellow.shade400),
               const SizedBox(width: 20),
               Icon(Icons.auto_awesome, size: 8, color: Colors.pink.shade200),
             ],
@@ -76,13 +121,17 @@ class _EmptyState extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.auto_awesome, size: 8, color: Colors.purple.shade200),
+              Icon(Icons.auto_awesome,
+                  size: 8, color: Colors.purple.shade200),
               const SizedBox(width: 20),
-              Icon(Icons.auto_awesome, size: 22, color: Colors.yellow.shade400),
+              Icon(Icons.auto_awesome,
+                  size: 22, color: Colors.yellow.shade400),
               const SizedBox(width: 10),
-              Icon(Icons.auto_awesome, size: 10, color: Colors.blue.shade300),
+              Icon(Icons.auto_awesome,
+                  size: 10, color: Colors.blue.shade300),
               const SizedBox(width: 30),
-              Icon(Icons.auto_awesome, size: 8, color: Colors.orange.shade200),
+              Icon(Icons.auto_awesome,
+                  size: 8, color: Colors.orange.shade200),
             ],
           ),
         ],
@@ -91,6 +140,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+// ── Message List ───────────────────────────────────────────────────────────
 class _MessageList extends StatefulWidget {
   final ChatController controller;
   const _MessageList({required this.controller});
@@ -106,7 +156,8 @@ class _MessageListState extends State<_MessageList> {
   void initState() {
     super.initState();
     ever(widget.controller.messages, (_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _scrollToBottom());
     });
   }
 
@@ -132,7 +183,8 @@ class _MessageListState extends State<_MessageList> {
       final msgs = widget.controller.messages;
       return ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         itemCount: msgs.length,
         itemBuilder: (_, i) {
           final msg = msgs[i];
@@ -145,6 +197,7 @@ class _MessageListState extends State<_MessageList> {
   }
 }
 
+// ── User Bubble ────────────────────────────────────────────────────────────
 class _UserBubble extends StatelessWidget {
   final ChatMessage message;
   const _UserBubble({required this.message});
@@ -160,16 +213,34 @@ class _UserBubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // ── Image ──
+
+                // ── Image (tappable → full preview) ──
                 if (message.localImagePath != null ||
                     message.imageUrl != null) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: message.localImagePath != null
-                        ? Image.file(File(message.localImagePath!),
-                        width: 180, height: 180, fit: BoxFit.cover)
-                        : Image.network(message.imageUrl!,
-                        width: 180, height: 180, fit: BoxFit.cover),
+                  GestureDetector(
+                    onTap: () => _openFullImagePreview(
+                      context,
+                      file: message.localImagePath != null
+                          ? File(message.localImagePath!)
+                          : null,
+                      url: message.imageUrl,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: message.localImagePath != null
+                          ? Image.file(
+                        File(message.localImagePath!),
+                        width: 180,
+                        height: 180,
+                        fit: BoxFit.cover,
+                      )
+                          : Image.network(
+                        message.imageUrl!,
+                        width: 180,
+                        height: 180,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 4),
                 ],
@@ -188,7 +259,8 @@ class _UserBubble extends StatelessWidget {
                 if (message.message.isNotEmpty)
                   Container(
                     constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.72),
+                        maxWidth:
+                        MediaQuery.of(context).size.width * 0.72),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     decoration: const BoxDecoration(
@@ -201,9 +273,10 @@ class _UserBubble extends StatelessWidget {
                       ),
                     ),
                     child: AppText(
-                        data: message.message,
-                        color: Colors.white,
-                        fontSize: 15),
+                      data: message.message,
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
                   ),
               ],
             ),
@@ -214,7 +287,7 @@ class _UserBubble extends StatelessWidget {
   }
 }
 
-// ── Audio Player Widget ─────────────────────────────────
+// ── Audio Bubble ───────────────────────────────────────────────────────────
 class _AudioBubble extends StatefulWidget {
   final String? localPath;
   final String? remoteUrl;
@@ -245,11 +318,13 @@ class _AudioBubbleState extends State<_AudioBubble> {
       }
     });
 
-    _player.durationStream.listen((d) {
+    _player.durationStream
+        .listen((d) {
       if (mounted) setState(() => _duration = d ?? Duration.zero);
     });
 
-    _player.positionStream.listen((p) {
+    _player.positionStream
+        .listen((p) {
       if (mounted) setState(() => _position = p);
     });
   }
@@ -286,7 +361,8 @@ class _AudioBubbleState extends State<_AudioBubble> {
         : 0.0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding:
+      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF1F2A44),
         borderRadius: BorderRadius.circular(16),
@@ -299,7 +375,8 @@ class _AudioBubbleState extends State<_AudioBubble> {
               if (_isPlaying) {
                 await _player.pause();
               } else {
-                if (_player.processingState == ProcessingState.completed) {
+                if (_player.processingState ==
+                    ProcessingState.completed) {
                   await _player.seek(Duration.zero);
                 }
                 await _player.play();
@@ -331,15 +408,16 @@ class _AudioBubbleState extends State<_AudioBubble> {
                   child: LinearProgressIndicator(
                     value: progress.clamp(0.0, 1.0),
                     backgroundColor: Colors.white24,
-                    valueColor:
-                    const AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white),
                     minHeight: 3,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${_fmt(_position)} / ${_fmt(_duration)}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+                  style: const TextStyle(
+                      color: Colors.white70, fontSize: 10),
                 ),
               ],
             ),
@@ -350,6 +428,7 @@ class _AudioBubbleState extends State<_AudioBubble> {
   }
 }
 
+// ── AI Bubble ──────────────────────────────────────────────────────────────
 class _AiBubble extends StatelessWidget {
   final ChatMessage message;
   const _AiBubble({required this.message});
@@ -364,7 +443,8 @@ class _AiBubble extends StatelessWidget {
           Container(
             constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.78),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: const BorderRadius.only(
@@ -388,6 +468,7 @@ class _AiBubble extends StatelessWidget {
   }
 }
 
+// ── Typing Indicator ───────────────────────────────────────────────────────
 class _TypingIndicator extends StatefulWidget {
   const _TypingIndicator();
 
@@ -410,8 +491,10 @@ class _TypingIndicatorState extends State<_TypingIndicator>
       ),
     );
     for (int i = 0; i < 3; i++) {
-      Future.delayed(Duration(milliseconds: i * 160),
-              () => _controllers[i].repeat(reverse: true));
+      Future.delayed(
+        Duration(milliseconds: i * 160),
+            () => _controllers[i].repeat(reverse: true),
+      );
     }
   }
 
@@ -448,6 +531,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
   }
 }
 
+// ── Chat Input Bar ─────────────────────────────────────────────────────────
 class _ChatInputBar extends StatelessWidget {
   final ChatController controller;
   const _ChatInputBar({required this.controller});
@@ -463,15 +547,96 @@ class _ChatInputBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
 
-            // ── Audio preview ──
+
+            Obx(() {
+              if (controller.selectedImage.value == null) {
+                return const SizedBox.shrink();
+              }
+              final file = controller.selectedImage.value!;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // ── Thumbnail ──
+                        GestureDetector(
+                          onTap: () => _openFullImagePreview(context, file: file),
+                          child: Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.15),
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(13),
+                              child: Image.file(
+                                file,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // ── ✕ remove button ──
+                        Positioned(
+                          top: -6,
+                          right: -6,
+                          child: GestureDetector(
+                            onTap: controller.removeImage,
+                            child: Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade800,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.4),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+
+            // ── Audio preview ──────────────────────────────────────────
             Obx(() {
               if (controller.selectedAudio.value == null) {
                 return const SizedBox.shrink();
               }
               return Container(
                 margin: const EdgeInsets.only(bottom: 6),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -498,7 +663,7 @@ class _ChatInputBar extends StatelessWidget {
               );
             }),
 
-            // ── Main input row ──
+            // ── Main input row ─────────────────────────────────────────
             Row(
               children: [
 
@@ -523,29 +688,20 @@ class _ChatInputBar extends StatelessWidget {
                   ),
                 )),
 
-                // Image picker
-                Obx(() => GestureDetector(
+                // Image picker icon
+                GestureDetector(
                   onTap: controller.pickImage,
-                  onLongPress: controller.removeImage,
                   child: Container(
-                    height: 36,
-                    width: 36,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
                     ),
-                    child: controller.selectedImage.value != null
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        controller.selectedImage.value!,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                        : const Icon(Icons.image,
-                        color: Colors.grey, size: 20),
+                    child: const Icon(Icons.image_outlined,
+                        color: Colors.white, size: 20),
                   ),
-                )),
+                ),
 
                 const SizedBox(width: 8),
 
