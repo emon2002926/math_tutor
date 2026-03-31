@@ -3,6 +3,7 @@ import 'package:flutter_project/core/app_text.dart';
 import 'package:flutter_project/mainscreen/controllers/chat_controller.dart';
 import 'package:flutter_project/mainscreen/widgets/chat_drawer.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:io';
 import '../core/widgets/math_text.dart';
@@ -114,8 +115,9 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 24),
           AppText(
             data: 'chat_empty_title'.tr,
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
+            googleFontFamily:GoogleFonts.montserrat ,
           ),
           const SizedBox(height: 24),
           Row(
