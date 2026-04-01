@@ -1,48 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 
+
 class MathText extends StatelessWidget {
   final String data;
   final Color color;
   final double fontSize;
+  final FontWeight fontWeight;
+  final TextStyle Function({TextStyle? textStyle})? googleFontFamily;
 
   const MathText({
     super.key,
     required this.data,
     this.color = Colors.black87,
     this.fontSize = 15,
+    this.fontWeight = FontWeight.normal,
+    this.googleFontFamily,
   });
+
+  TextStyle get _baseStyle {
+    final base = TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+    );
+    if (googleFontFamily != null) {
+      return googleFontFamily!(textStyle: base);
+    }
+    return base;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final spans = _buildSpans(data);
+    final maxWidth = MediaQuery.of(context).size.width * 0.72;
+    final spans = _buildSpans(maxWidth);
+
     return RichText(
-      text: TextSpan(children: spans),
+      softWrap: true,
+      textWidthBasis: TextWidthBasis.longestLine,
+      text: TextSpan(
+        style: _baseStyle,   // default style so plain TextSpans inherit it
+        children: spans,
+      ),
     );
   }
 
-  List<InlineSpan> _buildSpans(String text) {
+  List<InlineSpan> _buildSpans(double maxWidth) {
     final List<InlineSpan> spans = [];
 
-    // Matches $$...$$, \[...\], $...$, \(...\)  — order matters!
     final regex = RegExp(
       r'\$\$(.+?)\$\$|\\\[(.+?)\\\]|\$(.+?)\$|\\\((.+?)\\\)',
       dotAll: true,
     );
     int lastEnd = 0;
 
-    for (final match in regex.allMatches(text)) {
-      // Plain text before match
+    for (final match in regex.allMatches(data)) {
+      // ── plain text before this math chunk ──
       if (match.start > lastEnd) {
         spans.add(TextSpan(
-          text: text.substring(lastEnd, match.start),
-          style: TextStyle(color: color, fontSize: fontSize),
+          text: data.substring(lastEnd, match.start),
+          style: _baseStyle,
         ));
       }
 
-      // group(1) = $$...$$  group(2) = \[...\]  group(3) = $...$  group(4) = \(...\)
-      final latex = match.group(1) ?? match.group(2) ??
-          match.group(3) ?? match.group(4) ?? '';
+      final latex = match.group(1) ??
+          match.group(2) ??
+          match.group(3) ??
+          match.group(4) ??
+          '';
       final isBlock = match.group(1) != null || match.group(2) != null;
 
       spans.add(WidgetSpan(
@@ -52,12 +77,16 @@ class MathText extends StatelessWidget {
             horizontal: 2,
             vertical: isBlock ? 6 : 0,
           ),
-          child: Math.tex(
-            latex,
-            textStyle: TextStyle(fontSize: fontSize, color: color),
-            onErrorFallback: (err) => Text(
-              latex,
-              style: TextStyle(color: color, fontSize: fontSize),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Math.tex(
+                latex,
+                textStyle: _baseStyle,
+                onErrorFallback: (err) => Text(latex, style: _baseStyle),
+              ),
             ),
           ),
         ),
@@ -66,11 +95,11 @@ class MathText extends StatelessWidget {
       lastEnd = match.end;
     }
 
-    // Remaining plain text after last match
-    if (lastEnd < text.length) {
+    // ── remaining plain text ──
+    if (lastEnd < data.length) {
       spans.add(TextSpan(
-        text: text.substring(lastEnd),
-        style: TextStyle(color: color, fontSize: fontSize),
+        text: data.substring(lastEnd),
+        style: _baseStyle,
       ));
     }
 

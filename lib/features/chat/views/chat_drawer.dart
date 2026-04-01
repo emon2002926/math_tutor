@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/util/app_navigation.dart';
 import '../../../core/util/storage_service.dart';
+import '../../../core/widgets/dialog/app_dialog.dart';
 import '../../../core/widgets/text/app_text.dart';
 import '../../auth/views/signin_page.dart';
 import '../controllers/chat_controller.dart';
@@ -8,20 +9,14 @@ import '../../profile/views/profile_page.dart';
 import '../../terms_condition/views/terms_and_condition_page.dart';
 import 'package:get/get.dart';
 
-class ChatDrawer extends StatefulWidget {
+import '../widgets/rename_dialog.dart';
+
+class ChatDrawer extends StatelessWidget {
   final ChatController controller;
   const ChatDrawer({super.key, required this.controller});
 
   @override
-  State<ChatDrawer> createState() => _ChatDrawerState();
-}
-
-class _ChatDrawerState extends State<ChatDrawer> {
-  bool _historyExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final controller = widget.controller;
     final isLoggedIn = controller.isLoggedIn;
 
     return Drawer(
@@ -54,11 +49,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
                 icon: const Icon(Icons.edit_square, size: 18, color: Colors.white),
-                label: AppText(
-                  data: 'new_chat'.tr,
-                  color: Colors.white,
-                  fontSize: 15,
-                ),
+                label: AppText(data: 'new_chat'.tr, color: Colors.white, fontSize: 15),
               ),
             ),
 
@@ -82,38 +73,36 @@ class _ChatDrawerState extends State<ChatDrawer> {
             ),
             const Divider(height: 1),
 
-            // ── History header ───────────────────
-            InkWell(
-              onTap: () =>
-                  setState(() => _historyExpanded = !_historyExpanded),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    AppText(
-                      data: 'history'.tr,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
+            // ── History header + list ─────────────
+            Expanded(
+              child: Obx(() => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: controller.toggleHistoryExpanded,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AppText(
+                            data: 'history'.tr,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                          Icon(controller.isHistoryExpanded.value
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down),
+                        ],
+                      ),
                     ),
-                    Icon(_historyExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down),
-                  ],
-                ),
-              ),
+                  ),
+                  if (controller.isHistoryExpanded.value && isLoggedIn)
+                    Expanded(child: _buildLoggedInHistory(context)),
+                ],
+              )),
             ),
-
-            // ── History list ─────────────────────
-            if (_historyExpanded)
-              Expanded(
-                child: isLoggedIn
-                    ? _buildLoggedInHistory(controller)
-                    : const SizedBox.shrink(),
-              )
-            else
-              const Spacer(),
 
             const Divider(height: 1),
 
@@ -122,21 +111,14 @@ class _ChatDrawerState extends State<ChatDrawer> {
               padding: const EdgeInsets.all(16),
               child: isLoggedIn
                   ? ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  StorageService.logout();
-                  AppNavigation.pushAndClear(SignInPage());
-                },
+                onPressed: () => _showLogoutConfirm(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1F2A44),
                   minimumSize: const Size(double.infinity, 44),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
-                child: AppText(
-                  data: 'logout'.tr,
-                  color: Colors.white,
-                ),
+                child: AppText(data: 'logout'.tr, color: Colors.white),
               )
                   : Column(
                 mainAxisSize: MainAxisSize.min,
@@ -159,8 +141,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                           borderRadius: BorderRadius.circular(8)),
                     ),
                     child: AppText(
-                      data: 'login_or_signup'.tr,
-                      color: Colors.white,
+                        data: 'login_or_signup'.tr, color: Colors.white,
                     ),
                   ),
                 ],
@@ -176,22 +157,19 @@ class _ChatDrawerState extends State<ChatDrawer> {
   // HISTORY LIST
   // ════════════════════════════════════════════════════════
 
-  Widget _buildLoggedInHistory(ChatController controller) {
+  Widget _buildLoggedInHistory(BuildContext context) {
     return Obx(() {
       if (controller.isLoadingSessions.value) {
         return const Center(child: CircularProgressIndicator());
       }
       if (controller.chatSessions.isEmpty) {
-        return Center(
-          child: AppText(data: 'no_chats'.tr, color: Colors.grey),
-        );
+        return Center(child: AppText(data: 'no_chats'.tr, color: Colors.grey));
       }
       return ListView.builder(
         itemCount: controller.chatSessions.length,
         itemBuilder: (ctx, i) {
           final session = controller.chatSessions[i];
-          final title =
-              session['title'] as String? ?? 'Chat ${session['id']}';
+          final title = session['title'] as String? ?? 'Chat ${session['id']}';
           final id = session['id'] as int;
 
           return ListTile(
@@ -210,13 +188,15 @@ class _ChatDrawerState extends State<ChatDrawer> {
             trailing: PopupMenuButton<String>(
               icon: const Icon(Icons.more_horiz, size: 18, color: Colors.grey),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
+                  borderRadius: BorderRadius.circular(16)),
+              elevation: 8,
+              shadowColor: Colors.black.withOpacity(0.15),
+              color: Colors.white,
               onSelected: (value) {
                 if (value == 'rename') {
-                  _showRenameDialog(context, controller, id, title);
+                  _showRenameDialog(context, id, title);
                 } else if (value == 'delete') {
-                  _showDeleteConfirm(context, controller, id);
+                  _showDeleteConfirm(context, id);
                 }
               },
               itemBuilder: (_) => [
@@ -224,7 +204,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   value: 'rename',
                   label: 'Rename',
                   icon: Icons.edit_outlined,
-                  color: Colors.black87,
+                  color: const Color(0xFF1F2A44),
                 ),
                 _popupItem(
                   value: 'delete',
@@ -250,27 +230,73 @@ class _ChatDrawerState extends State<ChatDrawer> {
     required IconData icon,
     required Color color,
   }) {
+    final isDelete = value == 'delete';
     return PopupMenuItem<String>(
       value: value,
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(width: 12),
-          Text(label, style: TextStyle(color: color, fontSize: 14)),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isDelete
+              ? Colors.red.withOpacity(0.06)
+              : const Color(0xFF1F2A44).withOpacity(0.05),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: isDelete
+                    ? Colors.red.withOpacity(0.1)
+                    : const Color(0xFF1F2A44).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 16, color: color),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // ════════════════════════════════════════════════════════
-  // DIALOG — Rename (delegates to _RenameDialog widget)
+  // DIALOGS
   // ════════════════════════════════════════════════════════
 
-  void _showRenameDialog(BuildContext context, ChatController controller,
-      int id, String currentTitle) {
+  void _showLogoutConfirm(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => _RenameDialog(
+      builder: (_) => AppDialog(
+        title: 'logout'.tr,
+        description: 'logout_confirm'.tr,
+        confirmText: 'logout'.tr,
+        cancelText: 'cancel'.tr,
+        onCancel: () => Navigator.pop(context),
+        onConfirm: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          StorageService.logout();
+          AppNavigation.pushAndClear(SignInPage());
+        },
+      ),
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, int id, String currentTitle) {
+    showDialog(
+      context: context,
+      builder: (_) => RenameDialog(
         currentTitle: currentTitle,
         onSave: (newTitle) {
           Navigator.pop(context);
@@ -280,96 +306,21 @@ class _ChatDrawerState extends State<ChatDrawer> {
     );
   }
 
-  // ════════════════════════════════════════════════════════
-  // DIALOG — Delete confirm
-  // ════════════════════════════════════════════════════════
-
-  void _showDeleteConfirm(
-      BuildContext context, ChatController controller, int id) {
+  void _showDeleteConfirm(BuildContext context, int id) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete Chat'),
-        content:
-        const Text('This chat will be permanently deleted. Are you sure?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(context); // close dialog
-              Navigator.pop(context); // close drawer
-              controller.deleteSession(id);
-            },
-            child: const Text('Delete',
-                style: TextStyle(color: Colors.white)),
-          ),
-        ],
+      builder: (_) => AppDialog(
+        title: 'delete_chat'.tr,
+        description: 'delete_chat_confirm'.tr,
+        confirmText: 'delete'.tr,
+        cancelText: 'cancel'.tr,
+        onCancel: () => Navigator.pop(context),
+        onConfirm: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          controller.deleteSession(id);
+        },
       ),
-    );
-  }
-}
-
-
-
-class _RenameDialog extends StatefulWidget {
-  final String currentTitle;
-  final ValueChanged<String> onSave;
-
-  const _RenameDialog({
-    required this.currentTitle,
-    required this.onSave,
-  });
-
-  @override
-  State<_RenameDialog> createState() => _RenameDialogState();
-}
-
-class _RenameDialogState extends State<_RenameDialog> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.currentTitle);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Rename Chat'),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        decoration: const InputDecoration(hintText: 'Enter new name'),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1F2A44),
-          ),
-          onPressed: () {
-            final newTitle = _controller.text.trim();
-            if (newTitle.isNotEmpty && newTitle != widget.currentTitle) {
-              widget.onSave(newTitle);
-            }
-          },
-          child: const Text('Save', style: TextStyle(color: Colors.white)),
-        ),
-      ],
     );
   }
 }

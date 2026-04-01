@@ -29,6 +29,8 @@ class ChatController extends GetxController {
   final isCreatingSession = false.obs;
   final chatSessions = <Map<String, dynamic>>[].obs;
   final isLoadingSessions = false.obs;
+  final isHistoryExpanded = false.obs;
+  void toggleHistoryExpanded() => isHistoryExpanded.value = !isHistoryExpanded.value;
 
   bool get isLoggedIn => StorageService.accessToken != null;
   String? get _token => StorageService.accessToken;

@@ -1,11 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/api_services.dart';
 import '../../../core/util/storage_service.dart';
 import '../../../core/widgets/snakbar/custom_snackbar.dart';
-import '../../mainscreen/views/chat_page.dart';
+import '../../chat/views/chat_page.dart';
 import '../views/forgotpassword_page.dart';
 import '../views/signup_page.dart';
 

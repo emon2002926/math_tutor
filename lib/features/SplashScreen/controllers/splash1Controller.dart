@@ -6,34 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import '../../../core/util/app_navigation.dart';
 import '../../../core/util/storage_service.dart';
 import '../views/splash_screen2.dart';
-import '../../mainscreen/views/chat_page.dart';
-
-/*
-class SplashController extends GetxController {
-  final RxInt activeIndex = 0.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    _navigate();
-  }
-
-  void _navigate() {
-    final String? token = StorageService.accessToken;
-    print("fdlgkh: $token");
-
-    Future.delayed(const Duration(seconds: 4), () {
-      if (token == null) {
-        Get.off(() => SplashScreen2());
-      } else {
-        Get.off(() => Chatingpage());
-      }
-    });
-  }
-}
-*/
-
-
+import '../../chat/views/chat_page.dart';
 
 class SplashController extends GetxController {
   final box = GetStorage();

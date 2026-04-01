@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -18,6 +19,13 @@ Future<void> main() async {
   Get.put(ApiServices(baseUrl: 'https://mathapi.dsrt321.online'));
   Get.put(LanguageController());
 
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,   // dark icons on light bg
+      statusBarBrightness: Brightness.dark,       // iOS
+    ),
+  );
   runApp(const MyApp());
 }
 
@@ -32,6 +40,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
+
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
