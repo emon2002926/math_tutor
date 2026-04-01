@@ -4,7 +4,6 @@ import 'package:flutter_project/controller/authController/singupOtpController.da
 import 'package:get/get.dart';
 import 'package:flutter_project/services/auth_service.dart';
 
-import '../../authpage/forgotOtppage.dart';
 
 class ForgotPasswordController extends GetxController {
   final emailController = TextEditingController();

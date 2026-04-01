@@ -1,9 +1,8 @@
 import 'package:flutter_project/controller/TearmController/termsmodel.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_project/core/utils/storege_service.dart';
-
-import '../../core/utils/api_service.dart';
+import '../../core/services/api_services.dart';
+import '../../core/util/storage_service.dart';
 
 
 class TermsController extends GetxController {

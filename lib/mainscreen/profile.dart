@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/mainscreen/terms&conditionpage.dart';
 import 'package:get/get.dart';
-
-import '../core/app_text.dart';
+import '../core/widgets/text/app_text.dart';
 import '../language_controller.dart';
 import 'controllers/profileController.dart';
 

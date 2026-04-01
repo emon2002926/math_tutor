@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_project/core/widgets/custom_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import '../../core/utils/api_service.dart';
-import '../../core/utils/storege_service.dart';
+import '../../core/services/api_services.dart';
+import '../../core/util/storage_service.dart';
+import '../../core/widgets/snakbar/custom_snackbar.dart';
 import '../models/chat_message.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:record/record.dart';

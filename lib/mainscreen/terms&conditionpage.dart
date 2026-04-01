@@ -3,10 +3,7 @@ import 'package:get/get.dart';
 
 import '../controller/TearmController/tearmController.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../controller/TearmController/tearmController.dart';
 
 class TermsConditionPage extends StatelessWidget {
   const TermsConditionPage({super.key});

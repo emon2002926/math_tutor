@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:flutter_project/core/utils/storege_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../core/util/storage_service.dart';
 
 class ProfileService {
   static const String baseUrl = "https://mathapi.dsrt321.online";

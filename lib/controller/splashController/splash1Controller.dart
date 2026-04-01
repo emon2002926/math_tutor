@@ -1,11 +1,12 @@
 // splash_controller.dart
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:flutter_project/core/utils/storege_service.dart';
 import 'package:flutter_project/mainscreen/chat_page.dart';
 import 'package:flutter_project/SplashScreen/splash_screen2.dart';
 import 'package:get_storage/get_storage.dart';
-import '../../core/utils/app_navigation.dart';
+
+import '../../core/util/app_navigation.dart';
+import '../../core/util/storage_service.dart';
 
 /*
 class SplashController extends GetxController {

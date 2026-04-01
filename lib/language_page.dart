@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/authpage/signin_page.dart';
 import 'package:flutter_project/images.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'language_controller.dart';
 

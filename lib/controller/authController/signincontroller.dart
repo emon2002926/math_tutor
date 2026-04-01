@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_project/authpage/signup_page.dart';
 import 'package:flutter_project/authpage/forgotpassword_page.dart';
 import 'package:flutter_project/services/auth_service.dart';
-
-import '../../core/widgets/custom_snackbar.dart';
+import '../../core/widgets/snakbar/custom_snackbar.dart';
 import '../../mainscreen/chat_page.dart';
 
 class SignInController extends GetxController {
