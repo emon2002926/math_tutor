@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../controller/TearmController/tearmController.dart';
+import '../../controller/TearmController/tearmController.dart';
 
 
 

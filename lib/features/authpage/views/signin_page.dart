@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../controller/authController/ressetpasswordController.dart';
-import '../core/widgets/text/app_text.dart';
-import '../images.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../../../images.dart';
+import '../controllers/signincontroller.dart';
 
 
-class ResetPasswordPage extends StatelessWidget {
-  final String resetToken;
 
-  const ResetPasswordPage({super.key, required this.resetToken});
+class SignInPage extends StatelessWidget {
+  const SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ResetPasswordController(resetToken: resetToken));
+    final controller = Get.put(SignInController());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -32,29 +31,27 @@ class ResetPasswordPage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20.h),
+              SizedBox(height: 8.h),
 
               // Title
               AppText(
-                data: 'reset_password'.tr,
+                data: 'sign_in'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
 
-              SizedBox(height: 8.h),
+              SizedBox(height: 20.h),
 
-              AppText(
-                data: 'reset_password_subtitle'.tr,
-                fontSize: 13,
-                color: Colors.black54,
-              ),
+              // Username
+              // _inputField('username'.tr, controller.usernameController),
 
-              SizedBox(height: 24.h),
+              // Email
+              _inputField('email'.tr, controller.emailController),
 
-              // New Password
+              // Password
               Obx(() => _inputField(
-                'new_password'.tr,
-                controller: controller.passwordController,
+                'password'.tr,
+                controller.passwordController,
                 isPassword: !controller.isPasswordVisible.value,
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -67,25 +64,25 @@ class ResetPasswordPage extends StatelessWidget {
                 ),
               )),
 
-              // Confirm Password
-              Obx(() => _inputField(
-                'confirm_password'.tr,
-                controller: controller.retypePasswordController,
-                isPassword: !controller.isRetypePasswordVisible.value,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    controller.isRetypePasswordVisible.value
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.grey,
+              SizedBox(height: 8.h),
+
+              // Forgot Password
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: controller.goToForgotPassword,
+                  child: AppText(
+                    data: 'forgot_password'.tr,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
                   ),
-                  onPressed: controller.toggleRetypePasswordVisibility,
                 ),
-              )),
+              ),
 
-              SizedBox(height: 32.h),
+              SizedBox(height: 12.h),
 
-              // Confirm Button
+              // Sign In Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -96,9 +93,7 @@ class ResetPasswordPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : controller.resetPassword,
+                  onPressed: controller.isLoading.value ? null : controller.login,
                   child: controller.isLoading.value
                       ? const SizedBox(
                     height: 20,
@@ -109,12 +104,64 @@ class ResetPasswordPage extends StatelessWidget {
                     ),
                   )
                       : AppText(
-                    data: 'confirm'.tr,
+                    data: 'sign_in'.tr,
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 )),
+              ),
+
+              SizedBox(height: 20.h),
+
+              // Divider
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: AppText(
+                      data: 'or'.tr,
+                      fontSize: 13,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const Expanded(child: Divider()),
+                ],
+              ),
+
+              SizedBox(height: 20.h),
+
+              // Social Buttons
+              Row(
+                children: [
+                  _socialButton(Icons.g_mobiledata),
+                  SizedBox(width: 10.w),
+                  _socialButton(Icons.apple),
+                ],
+              ),
+
+              SizedBox(height: 16.h),
+
+              // Sign Up redirect
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppText(
+                    data: 'dont_have_account'.tr,
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                  GestureDetector(
+                    onTap: controller.goToSignUp,
+                    child: AppText(
+                      data: 'sign_up'.tr,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -124,9 +171,9 @@ class ResetPasswordPage extends StatelessWidget {
   }
 
   Widget _inputField(
-      String hint, {
+      String hint,
+      TextEditingController controller, {
         bool isPassword = false,
-        TextEditingController? controller,
         Widget? suffixIcon,
       }) {
     return Padding(
@@ -155,6 +202,19 @@ class ResetPasswordPage extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xFF1F2A44), width: 1.5),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _socialButton(IconData icon) {
+    return Expanded(
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Icon(icon, size: 28, color: Colors.black87),
       ),
     );
   }

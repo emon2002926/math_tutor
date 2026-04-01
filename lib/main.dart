@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/SplashScreen/splash_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -10,6 +9,7 @@ import 'controller/splashController/splash1Controller.dart';
 import 'core/services/api_services.dart';
 import 'core/util/app_navigation.dart';
 import 'core/util/storage_service.dart';
+import 'features/SplashScreen/splash_screen.dart';
 import 'language_controller.dart';
 
 

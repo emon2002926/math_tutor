@@ -1,12 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../authpage/signin_page.dart';
-import '../../core/services/api_services.dart';
-import '../../core/util/app_navigation.dart';
-import '../../core/widgets/snakbar/custom_snackbar.dart';
+import '../../../core/services/api_services.dart';
+import '../../../core/util/app_navigation.dart';
+import '../../../core/widgets/snakbar/custom_snackbar.dart';
+import '../views/signin_page.dart';
 
 
 class ResetPasswordController extends GetxController {

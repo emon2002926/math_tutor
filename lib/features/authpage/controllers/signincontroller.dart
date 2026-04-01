@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_project/authpage/signup_page.dart';
-import 'package:flutter_project/authpage/forgotpassword_page.dart';
 import 'package:flutter_project/services/auth_service.dart';
-import '../../core/widgets/snakbar/custom_snackbar.dart';
+import '../../../core/widgets/snakbar/custom_snackbar.dart';
 import '../../mainscreen/chat_page.dart';
+import '../views/forgotpassword_page.dart';
+import '../views/signup_page.dart';
 
 class SignInController extends GetxController {
   final emailController    = TextEditingController();

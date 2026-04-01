@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/authpage/singup_otppage.dart';
-import 'package:flutter_project/controller/authController/singupOtpController.dart';
+import 'package:flutter_project/features/authpage/controllers/singupOtpController.dart';
 import 'package:get/get.dart';
 import 'package:flutter_project/services/auth_service.dart';
+
+import '../views/singup_otppage.dart';
 
 
 class ForgotPasswordController extends GetxController {

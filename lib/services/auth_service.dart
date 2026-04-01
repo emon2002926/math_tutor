@@ -47,9 +47,7 @@ class AuthService {
     return {"success": false, "data": data};
   }
 
-  /// ===========================
-  /// REGISTER USER
-  /// ===========================
+
   static Future<Map<String, dynamic>> registerUser({
     required String username,
     required String email,

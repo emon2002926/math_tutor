@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../controller/authController/singupController.dart';
-import '../core/widgets/text/app_text.dart';
-import '../images.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../../../images.dart';
+import '../controllers/singupController.dart';
 
 
 class SignUpPage extends StatelessWidget {
@@ -33,7 +33,7 @@ class SignUpPage extends StatelessWidget {
               SizedBox(height: 8.h),
 
               // Title
-              AppText(
+               AppText(
                 data: 'sign_up'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,

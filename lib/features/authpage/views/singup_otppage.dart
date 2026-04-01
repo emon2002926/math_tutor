@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../controller/authController/singupOtpController.dart';
-import '../core/widgets/text/app_text.dart';
-import '../images.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../../../images.dart';
+import '../controllers/singupOtpController.dart';
 
 
 class OtpPage extends StatelessWidget {

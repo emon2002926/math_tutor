@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_project/authpage/signin_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter_project/images.dart';
-
-import '../../authpage/resetpassword_page_email.dart';
-import '../../core/services/api_services.dart';
-import '../../core/util/app_navigation.dart';
-import '../../core/widgets/snakbar/custom_snackbar.dart';
-import '../../core/widgets/text/app_text.dart';
+import '../../../core/services/api_services.dart';
+import '../../../core/util/app_navigation.dart';
+import '../../../core/widgets/snakbar/custom_snackbar.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../views/resetpassword_page_email.dart';
+import '../views/signin_page.dart';
 
 enum OtpMode { register, forgotPassword }
 

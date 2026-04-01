@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/controller/ProfileController/user_profile.dart';
 import 'package:get/get.dart';
-import 'package:flutter_project/authpage/signin_page.dart';
-import '../../core/services/api_services.dart';
-import '../../core/util/app_navigation.dart';
-import '../../core/util/storage_service.dart';
-
+import '../../../core/services/api_services.dart';
+import '../../../core/util/app_navigation.dart';
+import '../../../core/util/storage_service.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../../../language_controller.dart';
+import '../../authpage/views/signin_page.dart';
 import 'dart:convert';
 
-import '../../core/widgets/text/app_text.dart';
-import '../../language_controller.dart';
+
 
 class ProfileController extends GetxController {
   final apiServices = Get.find<ApiServices>();

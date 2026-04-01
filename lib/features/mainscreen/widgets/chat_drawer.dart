@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../authpage/signin_page.dart';
-import '../../core/util/app_navigation.dart';
-import '../../core/util/storage_service.dart';
-import '../../core/widgets/text/app_text.dart';
+import '../../../core/util/app_navigation.dart';
+import '../../../core/util/storage_service.dart';
+import '../../../core/widgets/text/app_text.dart';
+import '../../authpage/views/signin_page.dart';
 import '../controllers/chat_controller.dart';
 import '../profile.dart';
 import '../terms&conditionpage.dart';

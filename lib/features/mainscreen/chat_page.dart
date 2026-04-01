@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/mainscreen/controllers/chat_controller.dart';
-import 'package:flutter_project/mainscreen/widgets/chat_drawer.dart';
+import 'package:flutter_project/features/mainscreen/widgets/chat_drawer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:io';
-import '../core/widgets/text/app_text.dart';
-import '../core/widgets/text/math_text.dart';
+import '../../core/widgets/text/app_text.dart';
+import '../../core/widgets/text/math_text.dart';
+import 'controllers/chat_controller.dart';
 import 'models/chat_message.dart';
 
 // ── Full-screen image preview helper ──────────────────────────────────────
