@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../core/util/app_navigation.dart';
 import '../../../core/util/storage_service.dart';
 import '../../../core/widgets/text/app_text.dart';
-import '../../authpage/views/signin_page.dart';
+import '../../auth/views/signin_page.dart';
 import '../controllers/chat_controller.dart';
-import '../profile.dart';
-import '../terms&conditionpage.dart';
+import '../../profile/views/profile_page.dart';
+import '../../terms_condition/views/terms_and_condition_page.dart';
 import 'package:get/get.dart';
 
 class ChatDrawer extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../controller/ProfileController/user_profile.dart';
+import '../../features/profile/models/user_profile.dart';
 import '../constants/app_constant.dart';
 import '../util/storage_service.dart';
 
