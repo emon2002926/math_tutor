@@ -300,9 +300,6 @@ class ChatDrawer extends StatelessWidget {
     );
   }
 
-  // ════════════════════════════════════════════════════════
-  // DIALOGS
-  // ════════════════════════════════════════════════════════
 
   void _showLogoutConfirm(BuildContext context) {
     showDialog(
