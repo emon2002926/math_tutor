@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../util/screen_size.dart';
 import '../text/app_text.dart';
 
 class AppDialog extends StatelessWidget {
@@ -22,16 +23,24 @@ class AppDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.w(20))),
       backgroundColor: Colors.white,
+      // ── Constrain width on tablet ──────────────────────────────────────
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: context.isTabletDevice
+            ? context.screenWidth * 0.25  // 50% of screen on tablet
+            : context.w(24),
+        vertical: context.h(40),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(context.w(24)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ── Title ──────────────────────────────
+            // ── Title ──────────────────────────────────────────────────────
             AppText(
               data: title ?? 'Confirm',
               fontSize: 17,
@@ -39,27 +48,27 @@ class AppDialog extends StatelessWidget {
               color: const Color(0xFF1F2A44),
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: context.h(10)),
 
-            // ── Description ────────────────────────
+            // ── Description ────────────────────────────────────────────────
             AppText(
               data: description ?? 'Are you sure?',
               fontSize: 14,
               color: Colors.grey.shade600,
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: context.h(24)),
 
-            // ── Actions ────────────────────────────
+            // ── Actions ────────────────────────────────────────────────────
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: onCancel,
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: EdgeInsets.symmetric(vertical: context.h(13)),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(context.w(12))),
                       side: BorderSide(color: Colors.grey.shade300),
                     ),
                     child: AppText(
@@ -70,16 +79,16 @@ class AppDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: context.w(12)),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onConfirm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1F2A44),
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: EdgeInsets.symmetric(vertical: context.h(13)),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(context.w(12))),
                     ),
                     child: AppText(
                       data: confirmText ?? 'Confirm',

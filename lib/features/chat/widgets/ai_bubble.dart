@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/features/chat/widgets/typing_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/text/math_text.dart';
 import '../models/chat_message.dart';
 
@@ -11,14 +12,16 @@ class AiBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: context.h(12)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.78),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                maxWidth: MediaQuery.of(context).size.width *
+                    (context.isTabletDevice ? 0.65 : 0.78)),
+            padding: EdgeInsets.symmetric(
+                horizontal: context.w(16), vertical: context.h(12)),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: const BorderRadius.only(

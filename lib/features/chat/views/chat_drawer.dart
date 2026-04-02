@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/util/app_navigation.dart';
+import '../../../core/util/screen_size.dart';
 import '../../../core/util/storage_service.dart';
+import '../../../core/widgets/buttons/app_button.dart';
 import '../../../core/widgets/dialog/app_dialog.dart';
 import '../../../core/widgets/text/app_text.dart';
 import '../../auth/views/signin_page.dart';
@@ -25,47 +27,61 @@ class ChatDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Menu icon ───────────────────────
+
+            // ── Menu icon ─────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(
+                  horizontal: context.w(8), vertical: context.h(4)),
               child: IconButton(
-                icon: const Icon(Icons.menu),
+                icon: Icon(Icons.menu, size: context.sp(22)),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
 
-            // ── New Chat ─────────────────────────
+            // ── New Chat ──────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElevatedButton.icon(
+              padding: EdgeInsets.symmetric(horizontal: context.w(16)),
+              child: AppButton(
+                buttonText: 'new_chat'.tr,
                 onPressed: () {
                   Navigator.pop(context);
                   controller.startNewChat();
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F2A44),
-                  minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: const Icon(Icons.edit_square, size: 18, color: Colors.white),
-                label: AppText(data: 'new_chat'.tr, color: Colors.white, fontSize: 15),
+                fillColor: const Color(0xFF1F2A44),
+                borderRadius: 8,
+                buttonHeight: 44,
+                fontSize: 15,
+                prefixIcon: Icons.edit_square,
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: context.h(8)),
             const Divider(height: 1),
 
-            // ── Profile ──────────────────────────
+            // ── Profile ───────────────────────────
             ListTile(
-              title: AppText(data: 'profile'.tr),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.w(16)),
+              leading: Icon(Icons.person_outline,
+                  size: context.sp(20), color: const Color(0xFF1F2A44)),
+              title: AppText(
+                data: 'profile'.tr,
+                fontSize: 15,
+                color: const Color(0xFF1F2A44),
+              ),
               onTap: () => AppNavigation.push(ProfilePage()),
             ),
             const Divider(height: 1),
 
-            // ── Terms ────────────────────────────
+            // ── Terms ─────────────────────────────
             ListTile(
-              title: AppText(data: 'terms_privacy'.tr),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.w(16)),
+              leading: Icon(Icons.shield_outlined,
+                  size: context.sp(20), color: const Color(0xFF1F2A44)),
+              title: AppText(
+                data: 'terms_privacy'.tr,
+                fontSize: 15,
+                color: const Color(0xFF1F2A44),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 AppNavigation.push(TermsConditionPage());
@@ -73,7 +89,7 @@ class ChatDrawer extends StatelessWidget {
             ),
             const Divider(height: 1),
 
-            // ── History header + list ─────────────
+            // ── History header + list ──────────────
             Expanded(
               child: Obx(() => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,8 +97,9 @@ class ChatDrawer extends StatelessWidget {
                   InkWell(
                     onTap: controller.toggleHistoryExpanded,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: context.w(16),
+                          vertical: context.h(14)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -90,10 +107,15 @@ class ChatDrawer extends StatelessWidget {
                             data: 'history'.tr,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
+                            color: const Color(0xFF1F2A44),
                           ),
-                          Icon(controller.isHistoryExpanded.value
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down),
+                          Icon(
+                            controller.isHistoryExpanded.value
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            size: context.sp(20),
+                            color: const Color(0xFF1F2A44),
+                          ),
                         ],
                       ),
                     ),
@@ -106,19 +128,17 @@ class ChatDrawer extends StatelessWidget {
 
             const Divider(height: 1),
 
-            // ── Bottom button ────────────────────
+            // ── Bottom button ─────────────────────
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(context.w(16)),
               child: isLoggedIn
-                  ? ElevatedButton(
+                  ? AppButton(
+                buttonText: 'logout'.tr,
                 onPressed: () => _showLogoutConfirm(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F2A44),
-                  minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                child: AppText(data: 'logout'.tr, color: Colors.white),
+                fillColor: const Color(0xFF1F2A44),
+                borderRadius: 8,
+                buttonHeight: 44,
+                fontSize: 15,
               )
                   : Column(
                 mainAxisSize: MainAxisSize.min,
@@ -127,22 +147,19 @@ class ChatDrawer extends StatelessWidget {
                     data: 'join_to_save'.tr,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
+                  SizedBox(height: context.h(12)),
+                  AppButton(
+                    buttonText: 'login_or_signup'.tr,
                     onPressed: () {
                       Navigator.pop(context);
                       AppNavigation.push(SignInPage());
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1F2A44),
-                      minimumSize: const Size(double.infinity, 44),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: AppText(
-                        data: 'login_or_signup'.tr, color: Colors.white,
-                    ),
+                    fillColor: const Color(0xFF1F2A44),
+                    borderRadius: 8,
+                    buttonHeight: 44,
+                    fontSize: 15,
                   ),
                 ],
               ),
@@ -163,32 +180,42 @@ class ChatDrawer extends StatelessWidget {
         return const Center(child: CircularProgressIndicator());
       }
       if (controller.chatSessions.isEmpty) {
-        return Center(child: AppText(data: 'no_chats'.tr, color: Colors.grey));
+        return Center(
+          child: AppText(
+              data: 'no_chats'.tr,
+              color: Colors.grey,
+              fontSize: 14),
+        );
       }
       return ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: context.h(4)),
         itemCount: controller.chatSessions.length,
         itemBuilder: (ctx, i) {
           final session = controller.chatSessions[i];
-          final title = session['title'] as String? ?? 'Chat ${session['id']}';
+          final title =
+              session['title'] as String? ?? 'Chat ${session['id']}';
           final id = session['id'] as int;
 
           return ListTile(
             dense: true,
+            contentPadding:
+            EdgeInsets.symmetric(horizontal: context.w(16)),
             title: AppText(
               data: title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
-              color: Colors.grey,
+              color: Colors.grey.shade600,
             ),
             onTap: () {
               Navigator.pop(context);
               controller.loadSession(id);
             },
             trailing: PopupMenuButton<String>(
-              icon: const Icon(Icons.more_horiz, size: 18, color: Colors.grey),
+              icon: Icon(Icons.more_horiz,
+                  size: context.sp(18), color: Colors.grey),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(context.w(16))),
               elevation: 8,
               shadowColor: Colors.black.withOpacity(0.15),
               color: Colors.white,
@@ -201,14 +228,16 @@ class ChatDrawer extends StatelessWidget {
               },
               itemBuilder: (_) => [
                 _popupItem(
+                  context: context,
                   value: 'rename',
-                  label: 'Rename',
+                  label: 'rename_chat'.tr,
                   icon: Icons.edit_outlined,
                   color: const Color(0xFF1F2A44),
                 ),
                 _popupItem(
+                  context: context,
                   value: 'delete',
-                  label: 'Delete',
+                  label: 'delete'.tr,
                   icon: Icons.delete_outline_rounded,
                   color: Colors.red,
                 ),
@@ -225,6 +254,7 @@ class ChatDrawer extends StatelessWidget {
   // ════════════════════════════════════════════════════════
 
   PopupMenuItem<String> _popupItem({
+    required BuildContext context,
     required String value,
     required String label,
     required IconData icon,
@@ -233,36 +263,36 @@ class ChatDrawer extends StatelessWidget {
     final isDelete = value == 'delete';
     return PopupMenuItem<String>(
       value: value,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: EdgeInsets.symmetric(
+          horizontal: context.w(16), vertical: context.h(4)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: context.w(12), vertical: context.h(10)),
         decoration: BoxDecoration(
           color: isDelete
               ? Colors.red.withOpacity(0.06)
               : const Color(0xFF1F2A44).withOpacity(0.05),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(context.w(10)),
         ),
         child: Row(
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: context.w(32),
+              height: context.w(32),
               decoration: BoxDecoration(
                 color: isDelete
                     ? Colors.red.withOpacity(0.1)
                     : const Color(0xFF1F2A44).withOpacity(0.08),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(context.w(8)),
               ),
-              child: Icon(icon, size: 16, color: color),
+              child: Icon(icon, size: context.sp(16), color: color),
             ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+            SizedBox(width: context.w(12)),
+            AppText(
+              data: label,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: color,
             ),
           ],
         ),

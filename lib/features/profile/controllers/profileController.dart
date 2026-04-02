@@ -3,10 +3,13 @@ import 'package:flutter_project/features/profile/models/user_profile.dart';
 import 'package:get/get.dart';
 import '../../../core/services/api_services.dart';
 import '../../../core/util/app_navigation.dart';
+import '../../../core/util/screen_size.dart';
 import '../../../core/util/storage_service.dart';
+import '../../../core/widgets/buttons/app_button.dart';
 import '../../../core/widgets/dialog/app_dialog.dart';
 import '../../../core/widgets/snakbar/custom_snackbar.dart';
 import '../../../core/widgets/text/app_text.dart';
+import '../../../core/widgets/text/text_field/AppTextFiled.dart';
 import '../../auth/views/signin_page.dart';
 import '../../language/controllers/language_controller.dart';
 import 'dart:convert';
@@ -68,14 +71,22 @@ class ProfileController extends GetxController {
 
   void showLanguageDialog(BuildContext context) {
     final langCtrl = LanguageController.to;
+    final isTablet = context.isTabletDevice;
 
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.w(20))),
         backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: isTablet
+              ? context.screenWidth * 0.25
+              : context.w(24),
+          vertical: context.h(40),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(context.w(24)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,16 +96,17 @@ class ProfileController extends GetxController {
               Row(
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: context.w(38),
+                    height: context.w(38),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1F2A44).withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(context.w(10)),
                     ),
-                    child: const Icon(Icons.language,
-                        color: Color(0xFF1F2A44), size: 18),
+                    child: Icon(Icons.language,
+                        color: const Color(0xFF1F2A44),
+                        size: context.sp(18)),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: context.w(12)),
                   AppText(
                     data: 'change_language'.tr,
                     fontSize: 17,
@@ -104,7 +116,7 @@ class ProfileController extends GetxController {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: context.h(20)),
 
               // ── Options ──
               GetBuilder<LanguageController>(
@@ -112,12 +124,14 @@ class ProfileController extends GetxController {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _languageOption(
+                      context: context,
                       label: 'English',
                       isSelected: ctrl.langCode == 'en',
                       onTap: () => langCtrl.selectLanguage('en'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: context.h(8)),
                     _languageOption(
+                      context: context,
                       label: 'Български',
                       isSelected: ctrl.langCode == 'bg',
                       onTap: () => langCtrl.selectLanguage('bg'),
@@ -126,48 +140,38 @@ class ProfileController extends GetxController {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: context.h(24)),
 
               // ── Actions ──
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: AppButton(
+                      buttonText: 'cancel'.tr,
                       onPressed: () => Navigator.pop(ctx),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      child: AppText(
-                        data: 'cancel'.tr,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
-                      ),
+                      fillColor: Colors.transparent,
+                      borderColor: Colors.grey.shade300,
+                      borderWidth: 1,
+                      textColor: Colors.grey.shade600,
+                      borderRadius: 12,
+                      buttonHeight: 48,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: context.w(12)),
                   Expanded(
-                    child: ElevatedButton(
+                    child: AppButton(
+                      buttonText: 'confirm'.tr,
                       onPressed: () async {
                         await langCtrl.confirmLanguage();
                         Navigator.pop(ctx);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1F2A44),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: AppText(
-                        data: 'confirm'.tr,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      fillColor: const Color(0xFF1F2A44),
+                      borderRadius: 12,
+                      buttonHeight: 48,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -179,7 +183,10 @@ class ProfileController extends GetxController {
     );
   }
 
+
+
   Widget _languageOption({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
@@ -187,12 +194,15 @@ class ProfileController extends GetxController {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.w(16),
+          vertical: context.h(12),
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFF1F2A44).withOpacity(0.06)
               : Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(context.w(12)),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF1F2A44).withOpacity(0.3)
@@ -201,17 +211,20 @@ class ProfileController extends GetxController {
         ),
         child: Row(
           children: [
-            Icon(Icons.language,
-                size: 18,
-                color: isSelected
-                    ? const Color(0xFF1F2A44)
-                    : Colors.grey.shade500),
-            const SizedBox(width: 12),
+            Icon(
+              Icons.language,
+              size: context.sp(18),
+              color: isSelected
+                  ? const Color(0xFF1F2A44)
+                  : Colors.grey.shade500,
+            ),
+            SizedBox(width: context.w(12)),
             Expanded(
               child: AppText(
                 data: label,
                 fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontWeight:
+                isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected
                     ? const Color(0xFF1F2A44)
                     : Colors.grey.shade700,
@@ -221,7 +234,7 @@ class ProfileController extends GetxController {
               isSelected
                   ? Icons.check_circle
                   : Icons.radio_button_unchecked,
-              size: 20,
+              size: context.sp(20),
               color: isSelected
                   ? const Color(0xFF1F2A44)
                   : Colors.grey.shade400,
@@ -236,14 +249,23 @@ class ProfileController extends GetxController {
 
   void showEditUsernameDialog(BuildContext context) {
     final usernameController = TextEditingController(text: userName.value);
+    final isTablet = context.isTabletDevice;
 
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.w(20))),
         backgroundColor: Colors.white,
+        // ✅ Wider inset on tablets to constrain dialog width
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: isTablet
+              ? context.screenWidth * 0.25  // 50% of screen on tablet
+              : context.w(24),
+          vertical: context.h(40),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(context.w(24)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,16 +275,17 @@ class ProfileController extends GetxController {
               Row(
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: context.w(38),
+                    height: context.w(38),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1F2A44).withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(context.w(10)),
                     ),
-                    child: const Icon(Icons.person_outline,
-                        color: Color(0xFF1F2A44), size: 18),
+                    child: Icon(Icons.person_outline,
+                        color: const Color(0xFF1F2A44),
+                        size: context.sp(18)),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: context.w(12)),
                   AppText(
                     data: 'edit_username'.tr,
                     fontSize: 17,
@@ -272,87 +295,49 @@ class ProfileController extends GetxController {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: context.h(20)),
 
               // ── Text field ──
-              TextField(
+              AppTextField(
+                hintText: 'username'.tr,
                 controller: usernameController,
-                autofocus: true,
-                style: const TextStyle(
-                    fontSize: 15, color: Color(0xFF1F2A44)),
-                decoration: InputDecoration(
-                  hintText: 'username'.tr,
-                  hintStyle: TextStyle(
-                      color: Colors.grey.shade400, fontSize: 14),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                        color: Color(0xFF1F2A44), width: 1.5),
-                  ),
-                ),
+                focusedErrorBorderColor: const Color(0xFF1F2A44),
+                prefixIcon: Icons.person_outline,
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: context.h(24)),
 
               // ── Actions ──
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: AppButton(
+                      buttonText: 'cancel'.tr,
                       onPressed: () => Navigator.pop(ctx),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      child: AppText(
-                        data: 'cancel'.tr,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
-                      ),
+                      fillColor: Colors.transparent,
+                      borderColor: Colors.grey.shade300,
+                      borderWidth: 1,
+                      textColor: Colors.grey.shade600,
+                      borderRadius: 12,
+                      buttonHeight: 48,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: context.w(12)),
                   Expanded(
-                    child: Obx(() => ElevatedButton(
+                    child: Obx(() => AppButton(
+                      buttonText: 'save'.tr,
                       onPressed: isUpdating.value
                           ? null
                           : () => _updateUsername(
                           ctx, usernameController.text.trim()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1F2A44),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: isUpdating.value
-                          ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2),
-                      )
-                          : AppText(
-                        data: 'save'.tr,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      isLoading: isUpdating.value,
+                      fillColor: const Color(0xFF1F2A44),
+                      borderRadius: 12,
+                      buttonHeight: 48,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     )),
                   ),
                 ],
@@ -363,6 +348,8 @@ class ProfileController extends GetxController {
       ),
     );
   }
+
+
 
   Future<void> _updateUsername(BuildContext ctx, String newValue) async {
     if (newValue.isEmpty || newValue == userName.value) {

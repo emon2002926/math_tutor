@@ -9,21 +9,6 @@ import '../../../core/widgets/text/math_text.dart';
 import '../models/chat_message.dart';
 import 'audio_bubble.dart';
 
-
-
-
-
-
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_project/features/chat/widgets/fullImage_preview.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-import '../../../core/widgets/text/math_text.dart';
-import '../models/chat_message.dart';
-import 'audio_bubble.dart';
-
 class UserBubble extends StatelessWidget {
   final ChatMessage message;
   const UserBubble({super.key, required this.message});

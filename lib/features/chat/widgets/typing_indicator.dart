@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+
+import '../../../core/util/screen_size.dart';
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
 
@@ -24,7 +26,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
     for (int i = 0; i < 3; i++) {
       Future.delayed(
         Duration(milliseconds: i * 160),
-            () => _controllers[i].repeat(reverse: true),
+            () {
+          if (mounted) _controllers[i].repeat(reverse: true);
+        },
       );
     }
   }
@@ -37,6 +41,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final dotSize = context.w(8);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(3, (i) {
@@ -45,9 +50,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
           builder: (_, __) => Transform.translate(
             offset: Offset(0, -6 * _controllers[i].value),
             child: Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: dotSize,
+              height: dotSize,
+              margin: EdgeInsets.symmetric(horizontal: context.w(3)),
               decoration: BoxDecoration(
                 color: Colors.grey.shade500,
                 shape: BoxShape.circle,

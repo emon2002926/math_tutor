@@ -19,7 +19,7 @@ class AppTextField extends StatefulWidget {
   final VoidCallback? suffixIconOnTap;
   final VoidCallback? onSuffixIconTap;
   final Color? borderColor;
-  final Color? focusedErrorBorderColor; // 👈 optional custom error highlight color
+  final Color? focusedErrorBorderColor;
   final TextInputType? keyboardType;
   final bool enabled;
   final VoidCallback? label2OnClick;
@@ -30,6 +30,7 @@ class AppTextField extends StatefulWidget {
   final Color? shadowColor;
   final BorderRadius? customBorderRadius;
   final bool isHintTextInMiddle;
+  final Widget? suffixWidget;
 
   const AppTextField({
     super.key,
@@ -52,10 +53,11 @@ class AppTextField extends StatefulWidget {
     this.fillColor,
     this.inputTextColor,
     this.hintTextColor,
-    this.elevation = 8,
+    this.elevation = 0,
     this.shadowColor,
     this.customBorderRadius,
     this.isHintTextInMiddle = false,
+    this.suffixWidget,
   });
 
   @override
@@ -69,7 +71,6 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void initState() {
     super.initState();
-    // Use provided focusNode or create an internal one
     _effectiveFocusNode = widget.focusNode ?? FocusNode();
     _effectiveFocusNode.addListener(_onFocusChange);
   }
@@ -81,7 +82,6 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void dispose() {
     _effectiveFocusNode.removeListener(_onFocusChange);
-    // Only dispose if we created it internally
     if (widget.focusNode == null) _effectiveFocusNode.dispose();
     super.dispose();
   }
@@ -90,22 +90,23 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) {
     final effectiveSuffixTap = widget.suffixIconOnTap ?? widget.onSuffixIconTap;
 
-    final double inputFontSize     = context.responsiveFontSize(14);
-    final double iconSize          = context.responsiveSize(20);
-    final double borderRadius      = context.responsiveSize(10);
-    final double verticalPadding   = context.responsiveSize(14);
-    final double horizontalPadding = context.responsiveSize(16);
-    final double spacing           = context.responsiveSize(8);
+    // ✅ All sizing via ScreenSize extension — clamped for tablets
+    final double inputFontSize     = context.sp(14);
+    final double iconSize          = context.sp(20);
+    final double borderRadiusValue = context.w(10);
+    final double verticalPadding   = context.h(14);
+    final double horizontalPadding = context.w(16);
+    final double spacing           = context.h(8);
 
     final BorderRadius effectiveBorderRadius =
-        widget.customBorderRadius ?? BorderRadius.circular(borderRadius);
+        widget.customBorderRadius ?? BorderRadius.circular(borderRadiusValue);
 
-    // 👇 Determine border color based on focus state
     final Color activeBorderColor = _isFocused
-        ? (widget.focusedErrorBorderColor ?? Color(0xFFA68978))
+        ? (widget.focusedErrorBorderColor ?? const Color(0xFFA68978))
         : (widget.borderColor ?? Colors.transparent);
 
-    final borderSide = BorderSide(color: activeBorderColor, width: _isFocused ? 1.5 : 1.0);
+    final borderSide = BorderSide(
+        color: activeBorderColor, width: _isFocused ? 1.5 : 1.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,13 +126,11 @@ class _AppTextFieldState extends State<AppTextField> {
               if (widget.label2 != null)
                 GestureDetector(
                   onTap: widget.label2OnClick,
-                  child: Text(
-                    widget.label2!,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue,
-                      fontSize: inputFontSize,
-                    ),
+                  child: AppText(
+                    data: widget.label2!,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue,
+                    fontSize: 14,
                   ),
                 ),
             ],
@@ -151,38 +150,57 @@ class _AppTextFieldState extends State<AppTextField> {
             focusNode: _effectiveFocusNode,
             keyboardType: widget.keyboardType,
             enabled: widget.enabled,
-            textAlign: widget.isHintTextInMiddle ? TextAlign.center : TextAlign.start,
-            style: GoogleFonts.plusJakartaSans(
-              color: widget.inputTextColor,
+            textAlign: widget.isHintTextInMiddle
+                ? TextAlign.center
+                : TextAlign.start,
+            style: GoogleFonts.nunito(
+              color: widget.inputTextColor?? Color(0xFF2B2B2B),
               fontSize: inputFontSize,
             ),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: GoogleFonts.plusJakartaSans(
+              hintStyle: GoogleFonts.nunito(
                 color: widget.hintTextColor ?? Colors.grey,
                 fontSize: inputFontSize,
                 fontWeight: FontWeight.w400,
               ),
               filled: true,
-              fillColor: widget.enabled ? widget.fillColor : Colors.grey.shade300,
+              fillColor: widget.enabled
+                  ? (widget.fillColor ?? Colors.grey.shade100)
+                  : Colors.grey.shade300,
               prefixIcon: widget.prefixIcon != null
-                  ? Icon(widget.prefixIcon, color: _isFocused
-                  ? (widget.focusedErrorBorderColor ?? Colors.red) // 👈 icon color changes too
-                  : Colors.grey[700], size: iconSize)
-                  : null,
-              suffixIcon: widget.suffixIcon != null
-                  ? GestureDetector(
-                onTap: effectiveSuffixTap,
-                child: Icon(widget.suffixIcon, color: Color(0xFFA68978), size: iconSize),
+                  ? Icon(
+                widget.prefixIcon,
+                color: _isFocused
+                    ? (widget.focusedErrorBorderColor ?? Colors.red)
+                    : Colors.grey[700],
+                size: iconSize,
               )
                   : null,
+              suffixIcon: widget.suffixWidget ??
+                  (widget.suffixIcon != null
+                      ? GestureDetector(
+                    onTap: effectiveSuffixTap,
+                    child: Icon(
+                      widget.suffixIcon,
+                      color: const Color(0xFFA68978),
+                      size: iconSize,
+                    ),
+                  )
+                      : null),
               contentPadding: EdgeInsets.symmetric(
                 vertical: verticalPadding,
                 horizontal: horizontalPadding,
               ),
-              border: OutlineInputBorder(borderRadius: effectiveBorderRadius, borderSide: borderSide),
-              enabledBorder: OutlineInputBorder(borderRadius: effectiveBorderRadius, borderSide: borderSide),
-              focusedBorder: OutlineInputBorder(borderRadius: effectiveBorderRadius, borderSide: borderSide),
+              border: OutlineInputBorder(
+                  borderRadius: effectiveBorderRadius,
+                  borderSide: borderSide),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: effectiveBorderRadius,
+                  borderSide: borderSide),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: effectiveBorderRadius,
+                  borderSide: borderSide),
             ),
           ),
         ),

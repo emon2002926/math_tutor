@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/features/chat/views/chat_drawer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/text/app_text.dart';
 import '../controllers/chat_controller.dart';
 import '../models/chat_message.dart';
@@ -19,7 +20,6 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -54,6 +54,8 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = context.isTabletDevice;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -61,36 +63,42 @@ class _EmptyState extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.auto_awesome, size: 10, color: Colors.blue.shade200),
-              const SizedBox(width: 40),
               Icon(Icons.auto_awesome,
-                  size: 14, color: Colors.yellow.shade400),
-              const SizedBox(width: 20),
-              Icon(Icons.auto_awesome, size: 8, color: Colors.pink.shade200),
+                  size: context.sp(10), color: Colors.blue.shade200),
+              SizedBox(width: context.w(40)),
+              Icon(Icons.auto_awesome,
+                  size: context.sp(14), color: Colors.yellow.shade400),
+              SizedBox(width: context.w(20)),
+              Icon(Icons.auto_awesome,
+                  size: context.sp(8), color: Colors.pink.shade200),
             ],
           ),
-          const SizedBox(height: 24),
+
+          SizedBox(height: context.h(24)),
+
           AppText(
             data: 'chat_empty_title'.tr,
-            fontSize: 24,
+            fontSize: isTablet ? 20 : 24,
             fontWeight: FontWeight.bold,
-            googleFontFamily:GoogleFonts.montserrat ,
+            googleFontFamily: GoogleFonts.montserrat,
           ),
-          const SizedBox(height: 24),
+
+          SizedBox(height: context.h(24)),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.auto_awesome,
-                  size: 8, color: Colors.purple.shade200),
-              const SizedBox(width: 20),
+                  size: context.sp(8), color: Colors.purple.shade200),
+              SizedBox(width: context.w(20)),
               Icon(Icons.auto_awesome,
-                  size: 22, color: Colors.yellow.shade400),
-              const SizedBox(width: 10),
+                  size: context.sp(22), color: Colors.yellow.shade400),
+              SizedBox(width: context.w(10)),
               Icon(Icons.auto_awesome,
-                  size: 10, color: Colors.blue.shade300),
-              const SizedBox(width: 30),
+                  size: context.sp(10), color: Colors.blue.shade300),
+              SizedBox(width: context.w(30)),
               Icon(Icons.auto_awesome,
-                  size: 8, color: Colors.orange.shade200),
+                  size: context.sp(8), color: Colors.orange.shade200),
             ],
           ),
         ],
@@ -142,8 +150,8 @@ class _MessageListState extends State<_MessageList> {
       final msgs = widget.controller.messages;
       return ListView.builder(
         controller: _scrollController,
-        padding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+            horizontal: context.w(16), vertical: context.h(12)),
         itemCount: msgs.length,
         itemBuilder: (_, i) {
           final msg = msgs[i];
@@ -156,13 +164,19 @@ class _MessageListState extends State<_MessageList> {
   }
 }
 
+// ── Chat Input Bar ─────────────────────────────────────────────────────────
 class _ChatInputBar extends StatelessWidget {
   final ChatController controller;
   const _ChatInputBar({required this.controller});
+
   @override
   Widget build(BuildContext context) {
+    final iconSize  = context.w(38);
+    final btnRadius = context.w(25);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(
+          horizontal: context.w(12), vertical: context.h(8)),
       decoration: const BoxDecoration(color: Color(0xFF1F2A44)),
       child: SafeArea(
         top: false,
@@ -170,27 +184,27 @@ class _ChatInputBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
 
-
+            // ── Image preview ──────────────────────────────────────────
             Obx(() {
               if (controller.selectedImage.value == null) {
                 return const SizedBox.shrink();
               }
               final file = controller.selectedImage.value!;
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.only(bottom: context.h(10)),
                 child: Row(
                   children: [
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        // ── Thumbnail ──
                         GestureDetector(
-                          onTap: () => FullImagePreview.open(context, file: file),
+                          onTap: () =>
+                              FullImagePreview.open(context, file: file),
                           child: Container(
-                            width: 72,
-                            height: 72,
+                            width: context.w(72),
+                            height: context.w(72),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(context.w(14)),
                               border: Border.all(
                                 color: Colors.white.withOpacity(0.15),
                                 width: 1.5,
@@ -204,24 +218,20 @@ class _ChatInputBar extends StatelessWidget {
                               ],
                             ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(13),
-                              child: Image.file(
-                                file,
-                                fit: BoxFit.cover,
-                              ),
+                              borderRadius:
+                              BorderRadius.circular(context.w(13)),
+                              child: Image.file(file, fit: BoxFit.cover),
                             ),
                           ),
                         ),
-
-                        // ── ✕ remove button ──
                         Positioned(
                           top: -6,
                           right: -6,
                           child: GestureDetector(
                             onTap: controller.removeImage,
                             child: Container(
-                              width: 22,
-                              height: 22,
+                              width: context.w(22),
+                              height: context.w(22),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade800,
                                 shape: BoxShape.circle,
@@ -229,18 +239,10 @@ class _ChatInputBar extends StatelessWidget {
                                   color: Colors.white.withOpacity(0.3),
                                   width: 1,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.4),
-                                    blurRadius: 4,
-                                  ),
-                                ],
                               ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 13,
-                              ),
+                              child: Icon(Icons.close,
+                                  color: Colors.white,
+                                  size: context.sp(13)),
                             ),
                           ),
                         ),
@@ -257,18 +259,18 @@ class _ChatInputBar extends StatelessWidget {
                 return const SizedBox.shrink();
               }
               return Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6),
+                margin: EdgeInsets.only(bottom: context.h(6)),
+                padding: EdgeInsets.symmetric(
+                    horizontal: context.w(12), vertical: context.h(6)),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(context.w(12)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.audiotrack,
-                        color: Colors.white, size: 18),
-                    const SizedBox(width: 8),
+                    Icon(Icons.audiotrack,
+                        color: Colors.white, size: context.sp(18)),
+                    SizedBox(width: context.w(8)),
                     Expanded(
                       child: AppText(
                         data: 'audio_ready'.tr,
@@ -278,8 +280,8 @@ class _ChatInputBar extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: controller.removeAudio,
-                      child: const Icon(Icons.close,
-                          color: Colors.white70, size: 18),
+                      child: Icon(Icons.close,
+                          color: Colors.white70, size: context.sp(18)),
                     ),
                   ],
                 ),
@@ -290,12 +292,12 @@ class _ChatInputBar extends StatelessWidget {
             Row(
               children: [
 
-                // Mic
+                // ── Mic ──
                 Obx(() => GestureDetector(
                   onTap: controller.toggleRecording,
                   child: Container(
-                    width: 38,
-                    height: 38,
+                    width: iconSize,
+                    height: iconSize,
                     decoration: BoxDecoration(
                       color: controller.isRecording.value
                           ? Colors.red
@@ -307,79 +309,83 @@ class _ChatInputBar extends StatelessWidget {
                           ? Icons.stop
                           : Icons.mic,
                       color: Colors.white,
+                      size: context.sp(22),
                     ),
                   ),
                 )),
 
-                // Image picker icon
+                // ── Image picker ──
                 GestureDetector(
                   onTap: controller.pickImage,
                   child: Container(
-                    width: 38,
-                    height: 38,
+                    width: iconSize,
+                    height: iconSize,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.image_outlined,
-                        color: Colors.white, size: 20),
+                    child: Icon(Icons.image_outlined,
+                        color: Colors.white, size: context.sp(20)),
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                SizedBox(width: context.w(8)),
 
-                // Text field
+                // ── Text field ──
                 Expanded(
                   child: TextField(
                     controller: controller.textController,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => controller.sendMessage(),
+                    style: TextStyle(fontSize: context.sp(14)),
                     decoration: InputDecoration(
                       hintText: 'chat_hint'.tr,
                       hintStyle: TextStyle(
-                          color: Colors.grey.shade400, fontSize: 14),
+                          color: Colors.grey.shade400,
+                          fontSize: context.sp(14)),
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: context.w(16),
+                          vertical: context.h(10)),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(btnRadius),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(btnRadius),
                         borderSide: BorderSide.none,
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(btnRadius),
                         borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                SizedBox(width: context.w(8)),
 
-                // Send
+                // ── Send ──
                 Obx(() => GestureDetector(
                   onTap: controller.isSending.value
                       ? null
                       : controller.sendMessage,
                   child: Container(
-                    width: 38,
-                    height: 38,
+                    width: iconSize,
+                    height: iconSize,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: controller.isSending.value
-                        ? const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: CircularProgressIndicator(
+                        ? Padding(
+                      padding: EdgeInsets.all(context.w(10)),
+                      child: const CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2),
                     )
-                        : const Icon(Icons.send,
-                        color: Colors.white, size: 18),
+                        : Icon(Icons.send,
+                        color: Colors.white, size: context.sp(18)),
                   ),
                 )),
               ],

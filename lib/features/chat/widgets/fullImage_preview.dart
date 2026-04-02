@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/util/screen_size.dart';
+
 
 class FullImagePreview {
   static void open(BuildContext context, {File? file, String? url}) {
@@ -24,18 +26,19 @@ class FullImagePreview {
               ),
             ),
             Positioned(
-              top: 48,
-              right: 16,
+              top: context.h(48),
+              right: context.w(16),
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: context.w(36),
+                  height: context.w(36),
                   decoration: const BoxDecoration(
                     color: Colors.black54,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                  child: Icon(Icons.close,
+                      color: Colors.white, size: context.sp(20)),
                 ),
               ),
             ),

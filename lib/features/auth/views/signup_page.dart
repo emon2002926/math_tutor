@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../../core/util/screen_size.dart';
+import '../../../core/widgets/buttons/app_button.dart';
 import '../../../core/widgets/text/app_text.dart';
 import '../../../core/constants/images.dart';
+import '../../../core/widgets/text/text_field/AppTextFiled.dart';
 import '../controllers/singupController.dart';
 
 
@@ -12,210 +15,223 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(SignUpController());
+    final isTablet = context.isTabletDevice;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isTablet ? const Color(0xFFF0F2F5) : Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Logo
-              Center(
-                child: Image.asset(
-                  AppImages.Toplogo,
-                  height: 180.h,
-                  width: 140.w,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.pagePadding,
+              vertical: context.h(16),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Container(
+                padding: isTablet
+                    ? EdgeInsets.symmetric(
+                  horizontal: context.w(40),
+                  vertical: context.h(48),
+                )
+                    : EdgeInsets.symmetric(
+                  horizontal: context.w(4),
+                  vertical: context.h(8),
                 ),
-              ),
-
-              SizedBox(height: 8.h),
-
-              // Title
-               AppText(
-                data: 'sign_up'.tr,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-
-              SizedBox(height: 20.h),
-
-              // Username
-              _inputField('username'.tr, controller.usernameController),
-
-              // Email
-              _inputField('email'.tr, controller.emailController),
-
-              // Password
-              Obx(() => _inputField(
-                'password'.tr,
-                controller.passwordController,
-                isPassword: !controller.isPasswordVisible.value,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    controller.isPasswordVisible.value
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.grey,
-                  ),
-                  onPressed: controller.togglePasswordVisibility,
-                ),
-              )),
-
-              // Confirm Password
-              Obx(() => _inputField(
-                'confirm_password'.tr,
-                controller.confirmPasswordController,
-                isPassword: !controller.isConfirmPasswordVisible.value,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    controller.isConfirmPasswordVisible.value
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.grey,
-                  ),
-                  onPressed: controller.toggleConfirmPasswordVisibility,
-                ),
-              )),
-
-              SizedBox(height: 12.h),
-
-              // Sign Up Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: Obx(() => ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2A44),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                decoration: isTablet
+                    ? BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(context.w(24)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 32,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : controller.signUp,
-                  child: controller.isLoading.value
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+                  ],
+                )
+                    : null,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+
+                    // ── Logo ──────────────────────────────────────────────
+                    Center(
+                      child: Image.asset(
+                        AppImages.Toplogo,
+                        height: context.h(isTablet ? 120 : 180),
+                        width: context.w(isTablet ? 100 : 140),
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  )
-                      : AppText(
-                    data: 'sign_up'.tr,
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                )),
-              ),
 
-              SizedBox(height: 20.h),
+                    SizedBox(height: context.h(isTablet ? 24 : 8)),
 
-              // Divider
-              Row(
-                children: [
-                  const Expanded(child: Divider()),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: AppText(
-                      data: 'or'.tr,
-                      fontSize: 13,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const Expanded(child: Divider()),
-                ],
-              ),
-
-              SizedBox(height: 20.h),
-
-              // Social Buttons
-              Row(
-                children: [
-                  _socialButton(Icons.g_mobiledata),
-                  SizedBox(width: 10.w),
-                  _socialButton(Icons.apple),
-                ],
-              ),
-
-              SizedBox(height: 16.h),
-
-              // Sign In redirect
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppText(
-                    data: 'already_have_account'.tr,
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                  GestureDetector(
-                    onTap: controller.goToSignIn,
-                    child: AppText(
-                      data: 'sign_in'.tr,
-                      fontSize: 14,
+                    // ── Title ─────────────────────────────────────────────
+                    AppText(
+                      data: 'sign_up'.tr,
+                      fontSize: isTablet ? 22 : 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: const Color(0xFF1F2A44),
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: context.h(20)),
+
+                    // ── Username ──────────────────────────────────────────
+                    AppTextField(
+                      hintText: 'username'.tr,
+                      controller: controller.usernameController,
+                      focusedErrorBorderColor: const Color(0xFF1F2A44),
+                      prefixIcon: Icons.person_outline,
+                    ),
+
+                    SizedBox(height: context.h(4)),
+
+                    // ── Email ─────────────────────────────────────────────
+                    AppTextField(
+                      hintText: 'email'.tr,
+                      controller: controller.emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      focusedErrorBorderColor: const Color(0xFF1F2A44),
+                      prefixIcon: Icons.email_outlined,
+                    ),
+
+                    SizedBox(height: context.h(4)),
+
+                    // ── Password ──────────────────────────────────────────
+                    Obx(() => AppTextField(
+                      hintText: 'password'.tr,
+                      controller: controller.passwordController,
+                      obscureText: !controller.isPasswordVisible.value,
+                      focusedErrorBorderColor: const Color(0xFF1F2A44),
+                      prefixIcon: Icons.lock_outline,
+                      suffixWidget: IconButton(
+                        icon: Icon(
+                          controller.isPasswordVisible.value
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.black54,
+                          size: context.sp(20),
+                        ),
+                        onPressed: controller.togglePasswordVisibility,
+                      ),
+                    )),
+
+                    SizedBox(height: context.h(4)),
+
+                    // ── Confirm Password ──────────────────────────────────
+                    Obx(() => AppTextField(
+                      hintText: 'confirm_password'.tr,
+                      controller: controller.confirmPasswordController,
+                      obscureText:
+                      !controller.isConfirmPasswordVisible.value,
+                      focusedErrorBorderColor: const Color(0xFF1F2A44),
+                      prefixIcon: Icons.lock_outline,
+                      suffixWidget: IconButton(
+                        icon: Icon(
+                          controller.isConfirmPasswordVisible.value
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.black54,
+                          size: context.sp(20),
+                        ),
+                        onPressed:
+                        controller.toggleConfirmPasswordVisibility,
+                      ),
+                    )),
+
+                    SizedBox(height: context.h(12)),
+
+                    // ── Sign Up Button ────────────────────────────────────
+                    Obx(() => AppButton(
+                      buttonText: 'sign_up'.tr,
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : controller.signUp,
+                      isLoading: controller.isLoading.value,
+                      fillColor: const Color(0xFF1F2A44),
+                      borderRadius: 15,
+                      fontSize: 16,
+                      buttonHeight: 50,
+                      fontWeight: FontWeight.w600,
+                    )),
+
+                    SizedBox(height: context.h(20)),
+
+                    // ── Divider ───────────────────────────────────────────
+                    Row(
+                      children: [
+                        const Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: context.w(12)),
+                          child: AppText(
+                            data: 'or'.tr,
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const Expanded(child: Divider()),
+                      ],
+                    ),
+
+                    SizedBox(height: context.h(20)),
+
+                    // ── Social Buttons ────────────────────────────────────
+                    Row(
+                      children: [
+                        _socialButton(context, Icons.g_mobiledata),
+                        SizedBox(width: context.w(10)),
+                        _socialButton(context, Icons.apple),
+                      ],
+                    ),
+
+                    SizedBox(height: context.h(16)),
+
+                    // ── Sign In redirect ──────────────────────────────────
+                    Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          AppText(
+                            data: 'already_have_account'.tr,
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
+                          GestureDetector(
+                            onTap: controller.goToSignIn,
+                            child: AppText(
+                              data: 'sign_in'.tr,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: context.h(16)),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _inputField(
-      String hint,
-      TextEditingController controller, {
-        bool isPassword = false,
-        Widget? suffixIcon,
-      }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-          suffixIcon: suffixIcon,
-          filled: true,
-          fillColor: Colors.grey.shade100,
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: Color(0xFF1F2A44), width: 1.5),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _socialButton(IconData icon) {
+  Widget _socialButton(BuildContext context, IconData icon) {
     return Expanded(
       child: Container(
-        height: 50,
+        height: context.h(50),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(context.w(30)),
         ),
-        child: Icon(icon, size: 28, color: Colors.black87),
+        child: Icon(icon, size: context.sp(28), color: Colors.black87),
       ),
     );
   }

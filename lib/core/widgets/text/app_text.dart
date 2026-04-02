@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../util/screen_size.dart';
+
 
 
 
@@ -45,8 +47,9 @@ class AppText extends StatelessWidget {
   final TextStyle Function({TextStyle? textStyle})? googleFontFamily;
 
   TextStyle _buildTextStyle(BuildContext context) {
+    // ✅ Use ScreenSize extension sp() — already clamped for tablets
     final responsiveFontSize = useResponsiveFontSize && fontSize != null
-        ? _getResponsiveFontSize(context, fontSize!)
+        ? context.sp(fontSize!)
         : fontSize;
 
     TextStyle styleParams(TextStyle style) => style.copyWith(
@@ -88,32 +91,21 @@ class AppText extends StatelessWidget {
     if (!frosted) return textWidget;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(_getResponsiveSize(context, 10)),
+      borderRadius: BorderRadius.circular(context.w(10)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: _getResponsiveSize(context, 8),
-            vertical: _getResponsiveSize(context, 4),
+            horizontal: context.w(8),
+            vertical: context.h(4),
           ),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
-            borderRadius:
-            BorderRadius.circular(_getResponsiveSize(context, 10)),
+            borderRadius: BorderRadius.circular(context.w(10)),
           ),
           child: textWidget,
         ),
       ),
     );
-  }
-
-  double _getResponsiveFontSize(BuildContext context, double size) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth * (size / 375);
-  }
-
-  double _getResponsiveSize(BuildContext context, double size) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth * (size / 375);
   }
 }

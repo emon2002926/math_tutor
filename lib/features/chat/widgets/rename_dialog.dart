@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/core/widgets/text/app_text.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
+import '../../../core/util/screen_size.dart';
+import '../../../core/widgets/buttons/app_button.dart';
+import '../../../core/widgets/text/text_field/AppTextFiled.dart';
+
 class RenameDialog extends StatefulWidget {
   final String currentTitle;
   final ValueChanged<String> onSave;
@@ -28,11 +32,20 @@ class _RenameDialogState extends State<RenameDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = context.isTabletDevice;
+
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.w(20))),
       backgroundColor: Colors.white,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isTablet
+            ? context.screenWidth * 0.25
+            : context.w(24),
+        vertical: context.h(40),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(context.w(24)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,19 +55,19 @@ class _RenameDialogState extends State<RenameDialog> {
             Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: context.w(38),
+                  height: context.w(38),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1F2A44).withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(context.w(10)),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.edit_outlined,
-                    color: Color(0xFF1F2A44),
-                    size: 18,
+                    color: const Color(0xFF1F2A44),
+                    size: context.sp(18),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: context.w(12)),
                 AppText(
                   data: 'rename_chat'.tr,
                   fontSize: 17,
@@ -64,64 +77,39 @@ class _RenameDialogState extends State<RenameDialog> {
               ],
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: context.h(20)),
 
             // ── Text field ─────────────────────────
-            TextField(
+            AppTextField(
+              hintText: 'enter_new_name'.tr,
               controller: _controller,
-              autofocus: true,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Color(0xFF1F2A44),
-              ),
-              decoration: InputDecoration(
-                hintText: 'enter_new_name'.tr,
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                filled: true,
-                fillColor: Colors.grey.shade50,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                      color: Color(0xFF1F2A44), width: 1.5),
-                ),
-              ),
+              focusedErrorBorderColor: const Color(0xFF1F2A44),
+              prefixIcon: Icons.edit_outlined,
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: context.h(24)),
 
             // ── Actions ────────────────────────────
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
+                  child: AppButton(
+                    buttonText: 'cancel'.tr,
                     onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      side: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    child: AppText(
-                      data: 'cancel'.tr,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
-                    ),
+                    fillColor: Colors.transparent,
+                    borderColor: Colors.grey.shade300,
+                    borderWidth: 1,
+                    textColor: Colors.grey.shade600,
+                    borderRadius: 12,
+                    buttonHeight: 48,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: context.w(12)),
                 Expanded(
-                  child: ElevatedButton(
+                  child: AppButton(
+                    buttonText: 'save'.tr,
                     onPressed: () {
                       final newTitle = _controller.text.trim();
                       if (newTitle.isNotEmpty &&
@@ -129,19 +117,11 @@ class _RenameDialogState extends State<RenameDialog> {
                         widget.onSave(newTitle);
                       }
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1F2A44),
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: AppText(
-                      data: 'save'.tr,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    fillColor: const Color(0xFF1F2A44),
+                    borderRadius: 12,
+                    buttonHeight: 48,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
