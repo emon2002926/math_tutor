@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/buttons/app_button.dart';
@@ -81,8 +81,9 @@ class OtpPage extends StatelessWidget {
                     // ── Title ─────────────────────────────────────────────
                     AppText(
                       data: 'enter_otp'.tr,
-                      fontSize: isTablet ? 22 : 26,
-                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 22 : 28,
+                      fontWeight: FontWeight.w900,
+                      googleFontFamily: GoogleFonts.montserrat,
                       color: const Color(0xFF1F2A44),
                     ),
 

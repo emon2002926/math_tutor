@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/features/terms_condition/views/terms_and_condition_page.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/text/app_text.dart';
 import '../../language/controllers/language_controller.dart';
@@ -55,14 +56,9 @@ class ProfilePage extends StatelessWidget {
                   _SectionCard(
                     child: Row(
                       children: [
-                        Obx(() => CircleAvatar(
+                        Obx(() => _AvatarOrLottie(
+                          imageUrl: controller.userImage.value,
                           radius: context.w(isTablet ? 32 : 28),
-                          backgroundColor: const Color(0xFFE8EBF2),
-                          backgroundImage:
-                          controller.userImage.value.isNotEmpty
-                              ? NetworkImage(controller.userImage.value)
-                              : const NetworkImage(
-                              "https://i.pravatar.cc/150?img=3"),
                         )),
 
                         SizedBox(width: context.w(14)),
@@ -176,8 +172,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-
-
   void _showProfileBottomSheet(
       BuildContext context, ProfileController controller) {
     showModalBottomSheet(
@@ -272,6 +266,64 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// ── Avatar or Lottie placeholder ──────────────────────────────────────────────
+
+class _AvatarOrLottie extends StatefulWidget {
+  final String imageUrl;
+  final double radius;
+
+  const _AvatarOrLottie({required this.imageUrl, required this.radius});
+
+  @override
+  State<_AvatarOrLottie> createState() => _AvatarOrLottieState();
+}
+
+class _AvatarOrLottieState extends State<_AvatarOrLottie>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _lottieController;
+
+  @override
+  void initState() {
+    super.initState();
+    _lottieController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4), // ⬅ increase to slow down
+    );
+    _lottieController.repeat();
+  }
+
+  @override
+  void dispose() {
+    _lottieController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.imageUrl.isNotEmpty) {
+      return CircleAvatar(
+        radius: widget.radius,
+        backgroundColor: const Color(0xFFE8EBF2),
+        backgroundImage: NetworkImage(widget.imageUrl),
+      );
+    }
+
+    return Container(
+      width: widget.radius * 2,
+      height: widget.radius * 2,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFFE8EBF2),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Lottie.asset(
+        'assets/lottie/avatar_placeholder.json',
+        controller: _lottieController,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
 // ── Reusable card wrapper ─────────────────────────────────────────────────────
 
 class _SectionCard extends StatelessWidget {

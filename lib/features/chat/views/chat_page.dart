@@ -19,9 +19,9 @@ class ChatPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: Builder(
           builder: (ctx) => IconButton(
@@ -337,9 +337,10 @@ class _ChatInputBar extends StatelessWidget {
                     controller: controller.textController,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => controller.sendMessage(),
-                    style: TextStyle(fontSize: context.sp(14)),
+                    style: TextStyle(color:Colors.black87,fontSize: context.sp(14)),
                     decoration: InputDecoration(
                       hintText: 'chat_hint'.tr,
+
                       hintStyle: TextStyle(
                           color: Colors.grey.shade400,
                           fontSize: context.sp(14)),

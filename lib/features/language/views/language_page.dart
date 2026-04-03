@@ -23,85 +23,111 @@ class LanguagePage extends StatelessWidget {
     final isTablet = context.isTabletDevice;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isTablet ? const Color(0xFFF0F2F5) : Colors.white,
       body: SafeArea(
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.pagePadding,
-                vertical: context.h(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  SizedBox(height: context.h(22)),
-
-                  // ── Logo ────────────────────────────────────────────
-                  Center(
-                    child: Image.asset(
-                      AppImages.Toplogo,
-                      height: context.h(isTablet ? 150 : 200),
-                      width: context.w(isTablet ? 120 : 150),
-                      fit: BoxFit.contain,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.pagePadding,
+              vertical: context.h(16),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Container(
+                padding: isTablet
+                    ? EdgeInsets.symmetric(
+                  horizontal: context.w(40),
+                  vertical: context.h(48),
+                )
+                    : EdgeInsets.symmetric(
+                  horizontal: context.w(4),
+                  vertical: context.h(8),
+                ),
+                decoration: isTablet
+                    ? BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(context.w(24)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 32,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
+                  ],
+                )
+                    : null,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-                  SizedBox(height: context.h(24)),
+                    SizedBox(height: context.h(isTablet ? 8 : 22)),
 
-                  // ── Title ───────────────────────────────────────────
-                  AppText(
-                    data: 'select_language'.tr,
-                    fontSize: isTablet ? 22 : 26,
-                    fontWeight: FontWeight.bold,
-                    googleFontFamily: GoogleFonts.montserrat,
-                    color: const Color(0xFF1F2A44),
-                  ),
-
-                  SizedBox(height: context.h(16)),
-
-                  // ── Language Options ─────────────────────────────────
-                  GetBuilder<LanguageController>(
-                    builder: (ctrl) => Column(
-                      children: [
-                        _languageTile(
-                          context: context,
-                          label: 'English',
-                          value: 'en',
-                          selectedValue: ctrl.langCode,
-                          onTap: () => ctrl.selectLanguage('en'),
-                        ),
-                        SizedBox(height: context.h(10)),
-                        _languageTile(
-                          context: context,
-                          label: 'Български',
-                          value: 'bg',
-                          selectedValue: ctrl.langCode,
-                          onTap: () => ctrl.selectLanguage('bg'),
-                        ),
-                      ],
+                    // ── Logo ──────────────────────────────────────────────
+                    Center(
+                      child: Image.asset(
+                        AppImages.Toplogo,
+                        height: context.h(isTablet ? 120 : 200),
+                        width: context.w(isTablet ? 100 : 150),
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
 
-                  const Spacer(),
+                    SizedBox(height: context.h(24)),
 
-                  // ── Confirm Button ───────────────────────────────────
-                  AppButton(
-                    buttonText: 'confirm'.tr,
-                    onPressed: () async {
-                      await langCtrl.confirmLanguage();
-                      Get.off(() => const SignInPage());
-                    },
-                    fillColor: const Color(0xFF1F2A44),
-                    borderRadius: 16,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                    // ── Title ─────────────────────────────────────────────
+                    AppText(
+                      data: 'select_language'.tr,
+                      fontSize: isTablet ? 22 : 26,
+                      fontWeight: FontWeight.bold,
+                      googleFontFamily: GoogleFonts.montserrat,
+                      color: const Color(0xFF1F2A44),
+                    ),
 
-                  SizedBox(height: context.h(16)),
-                ],
+                    SizedBox(height: context.h(16)),
+
+                    // ── Language Options ──────────────────────────────────
+                    GetBuilder<LanguageController>(
+                      builder: (ctrl) => Column(
+                        children: [
+                          _languageTile(
+                            context: context,
+                            label: 'English',
+                            value: 'en',
+                            selectedValue: ctrl.langCode,
+                            onTap: () => ctrl.selectLanguage('en'),
+                          ),
+                          SizedBox(height: context.h(10)),
+                          _languageTile(
+                            context: context,
+                            label: 'Български',
+                            value: 'bg',
+                            selectedValue: ctrl.langCode,
+                            onTap: () => ctrl.selectLanguage('bg'),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: context.h(32)),
+
+                    // ── Confirm Button ────────────────────────────────────
+                    AppButton(
+                      buttonText: 'confirm'.tr,
+                      onPressed: () async {
+                        await langCtrl.confirmLanguage();
+                        Get.off(() => const SignInPage());
+                      },
+                      fillColor: const Color(0xFF1F2A44),
+                      borderRadius: 15,
+                      buttonHeight: 50,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+
+                    SizedBox(height: context.h(isTablet ? 8 : 16)),
+                  ],
+                ),
               ),
             ),
           ),
@@ -142,7 +168,7 @@ class LanguagePage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // ── Flag / Icon ──
+            // ── Icon ──
             Container(
               width: context.w(40),
               height: context.w(40),
@@ -168,7 +194,8 @@ class LanguagePage extends StatelessWidget {
               child: AppText(
                 data: label,
                 fontSize: 15,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight:
+                isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected
                     ? const Color(0xFF1F2A44)
                     : Colors.grey.shade700,

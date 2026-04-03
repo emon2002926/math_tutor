@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/buttons/app_button.dart';
 import '../../../core/widgets/text/app_text.dart';
@@ -71,8 +71,11 @@ class SignUpPage extends StatelessWidget {
                     // ── Title ─────────────────────────────────────────────
                     AppText(
                       data: 'sign_up'.tr,
+                      // fontSize: isTablet ? 22 : 28,
                       fontSize: isTablet ? 22 : 28,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
+                      googleFontFamily: GoogleFonts.montserrat,
+                      // fontWeight: FontWeight.bold,
                       color: const Color(0xFF1F2A44),
                     ),
 

@@ -35,11 +35,9 @@ class MathText extends StatelessWidget {
     final maxWidth = MediaQuery.of(context).size.width * 0.72;
     final spans = _buildSpans(maxWidth);
 
-    return RichText(
-      softWrap: true,
-      textWidthBasis: TextWidthBasis.longestLine,
-      text: TextSpan(
-        style: _baseStyle,   // default style so plain TextSpans inherit it
+    return SelectableText.rich(
+      TextSpan(
+        style: _baseStyle,
         children: spans,
       ),
     );
@@ -55,7 +53,6 @@ class MathText extends StatelessWidget {
     int lastEnd = 0;
 
     for (final match in regex.allMatches(data)) {
-      // ── plain text before this math chunk ──
       if (match.start > lastEnd) {
         spans.add(TextSpan(
           text: data.substring(lastEnd, match.start),
@@ -95,7 +92,6 @@ class MathText extends StatelessWidget {
       lastEnd = match.end;
     }
 
-    // ── remaining plain text ──
     if (lastEnd < data.length) {
       spans.add(TextSpan(
         text: data.substring(lastEnd),

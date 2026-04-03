@@ -70,14 +70,12 @@ class UserBubble extends StatelessWidget {
                         bottomRight: Radius.circular(4),
                       ),
                     ),
-                    child: SelectionArea(
-                      child: MathText(
-                        data: message.message,
-                        color: Colors.white,
-                        fontSize: 15,
-                        googleFontFamily: GoogleFonts.montserrat,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: MathText(
+                      data: message.message,
+                      color: Colors.white,
+                      fontSize: 15,
+                      googleFontFamily: GoogleFonts.montserrat,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
               ],

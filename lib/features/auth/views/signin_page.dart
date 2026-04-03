@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/util/screen_size.dart';
 import '../../../core/widgets/buttons/app_button.dart';
 import '../../../core/widgets/text/app_text.dart';
@@ -68,8 +69,9 @@ class SignInPage extends StatelessWidget {
                     // ── Title ─────────────────────────────────────────────
                     AppText(
                       data: 'sign_in'.tr,
-                      fontSize: context.sp(isTablet ? 22 : 28),
-                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 22 : 28,
+                      fontWeight: FontWeight.w900,
+                      googleFontFamily: GoogleFonts.montserrat,
                     ),
 
                     SizedBox(height: context.h(20)),

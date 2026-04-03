@@ -33,15 +33,13 @@ class AiBubble extends StatelessWidget {
             ),
             child: message.isLoading
                 ? const TypingIndicator()
-                : SelectionArea(
-              child: MathText(
-                data: message.message,
-                color: Colors.black87,
-                fontSize: 15,
-                googleFontFamily: GoogleFonts.montserrat,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+                : MathText(
+                  data: message.message,
+                  color: Colors.black87,
+                  fontSize: 15,
+                  googleFontFamily: GoogleFonts.montserrat,
+                  fontWeight: FontWeight.w500,
+                ),
           ),
         ],
       ),
