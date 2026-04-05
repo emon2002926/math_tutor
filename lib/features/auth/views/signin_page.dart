@@ -132,37 +132,6 @@ class SignInPage extends StatelessWidget {
                       buttonHeight: 50,
                       fontWeight: FontWeight.w600,
                     )),
-                    // Obx(() => SizedBox(
-                    //   width: double.infinity,
-                    //   height: context.h(50),
-                    //   child: ElevatedButton(
-                    //     style: ElevatedButton.styleFrom(
-                    //       backgroundColor: const Color(0xFF1F2A44),
-                    //       elevation: 0,
-                    //       shape: RoundedRectangleBorder(
-                    //         borderRadius: BorderRadius.circular(context.w(15)),
-                    //       ),
-                    //     ),
-                    //     onPressed: controller.isLoading.value
-                    //         ? null
-                    //         : controller.login,
-                    //     child: controller.isLoading.value
-                    //         ? SizedBox(
-                    //       height: context.h(20),
-                    //       width: context.w(20),
-                    //       child: const CircularProgressIndicator(
-                    //         color: Colors.white,
-                    //         strokeWidth: 2,
-                    //       ),
-                    //     )
-                    //         : AppText(
-                    //       data: 'sign_in'.tr,
-                    //       color: Colors.white,
-                    //       fontSize: context.sp(16),
-                    //       fontWeight: FontWeight.w600,
-                    //     ),
-                    //   ),
-                    // )),
 
                     SizedBox(height: context.h(20)),
 

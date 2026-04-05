@@ -3,9 +3,9 @@ class AppImages {
   //splash screen 1
   static const String BackgroundImage = "assets/images/logo6.png";
 
-  static const String Centerlogo2 = "assets/images/logo5.png";
+  // static const String Centerlogo2 = "assets/images/logo5.png";
   //Toplogo
-  static const String Toplogo = "assets/images/logo8.png";
+  static const String Toplogo = "assets/images/logo8.jpg";
 
   //splash screen 2
    static const String logo7= "assets/images/logo7.png";
