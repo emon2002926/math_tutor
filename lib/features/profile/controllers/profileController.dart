@@ -81,12 +81,15 @@ class ProfileController extends GetxController {
         backgroundColor: Colors.white,
         insetPadding: EdgeInsets.symmetric(
           horizontal: isTablet
-              ? context.screenWidth * 0.25
+              ? context.screenWidth * 0.30
               : context.w(24),
           vertical: context.h(40),
         ),
         child: Padding(
-          padding: EdgeInsets.all(context.w(24)),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.w(28),
+            vertical: context.h(32),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,14 +112,14 @@ class ProfileController extends GetxController {
                   SizedBox(width: context.w(12)),
                   AppText(
                     data: 'change_language'.tr,
-                    fontSize: 17,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF1F2A44),
                   ),
                 ],
               ),
 
-              SizedBox(height: context.h(20)),
+              SizedBox(height: context.h(24)),
 
               // ── Options ──
               GetBuilder<LanguageController>(
@@ -129,7 +132,7 @@ class ProfileController extends GetxController {
                       isSelected: ctrl.langCode == 'en',
                       onTap: () => langCtrl.selectLanguage('en'),
                     ),
-                    SizedBox(height: context.h(8)),
+                    SizedBox(height: context.h(10)),
                     _languageOption(
                       context: context,
                       label: 'Български',
@@ -140,7 +143,7 @@ class ProfileController extends GetxController {
                 ),
               ),
 
-              SizedBox(height: context.h(24)),
+              SizedBox(height: context.h(32)),
 
               // ── Actions ──
               Row(
@@ -154,7 +157,7 @@ class ProfileController extends GetxController {
                       borderWidth: 1,
                       textColor: Colors.grey.shade600,
                       borderRadius: 12,
-                      buttonHeight: 48,
+                      buttonHeight: 52,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -169,7 +172,7 @@ class ProfileController extends GetxController {
                       },
                       fillColor: const Color(0xFF1F2A44),
                       borderRadius: 12,
-                      buttonHeight: 48,
+                      buttonHeight: 52,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -182,7 +185,6 @@ class ProfileController extends GetxController {
       ),
     );
   }
-
 
 
   Widget _languageOption({
