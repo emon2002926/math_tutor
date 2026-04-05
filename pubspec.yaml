@@ -51,20 +51,17 @@ flutter:
 
   assets:
     - assets/images/
+
     - assets/lottie/avatar_placeholder.json
 
 
 
+#
+#  fonts:
+#     - family: Customfonts
+#       fonts:
+#         - asset: assets/fonts/Montserrat-Regular.ttf
 
-  fonts:
-     - family: Customfonts
-       fonts:
-         - asset: assets/fonts/Montserrat-Regular.ttf
 
 
-
-     - family: Customfonts2
-       fonts:
-         - asset: assets/fonts/Bitter-Italic.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
 

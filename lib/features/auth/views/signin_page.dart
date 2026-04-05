@@ -188,9 +188,9 @@ class SignInPage extends StatelessWidget {
                     // ── Social Buttons ────────────────────────────────────
                     Row(
                       children: [
-                        _socialButton(context, Icons.g_mobiledata),
+                        _socialButton(context, null,"assets/images/google_logo.png"),
                         SizedBox(width: context.w(10)),
-                        _socialButton(context, Icons.apple),
+                        _socialButton(context, Icons.apple,null),
                       ],
                     ),
 
@@ -228,7 +228,7 @@ class SignInPage extends StatelessWidget {
     );
   }
 
-  Widget _socialButton(BuildContext context, IconData icon) {
+  Widget _socialButton(BuildContext context, IconData? icon,String? imageAssets) {
     return Expanded(
       child: Container(
         height: context.h(50),
@@ -236,7 +236,11 @@ class SignInPage extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(context.w(30)),
         ),
-        child: Icon(icon, size: context.sp(28), color: Colors.black87),
+        child: icon != null?Icon(icon, size: context.sp(32), color: Colors.black87)
+            :Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset(imageAssets!,height: context.sp(28),width: context.sp(28),),
+            ),
       ),
     );
   }
