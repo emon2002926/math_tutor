@@ -7,11 +7,11 @@ import '../../../core/widgets/text/app_text.dart';
 
 
 class FullImagePreview {
-  static void open(BuildContext context, {File? file, String? url}) {
+  static void open(bool isFromAi,BuildContext context, {File? file, String? url}) {
     assert(file != null || url != null);
     showDialog(
       context: context,
-      barrierColor: Colors.black87,
+      barrierColor: isFromAi? Colors.black87:Colors.white,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: EdgeInsets.zero,

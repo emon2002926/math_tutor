@@ -28,7 +28,7 @@ class UserBubble extends StatelessWidget {
                 // ── Image ──
                 if (message.localImagePath != null || message.imageUrl != null) ...[
                   GestureDetector(
-                    onTap: () => FullImagePreview.open(
+                    onTap: () => FullImagePreview.open(true,
                       context,
                       file: message.localImagePath != null
                           ? File(message.localImagePath!)

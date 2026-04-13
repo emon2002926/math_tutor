@@ -43,7 +43,7 @@ class AiBubble extends StatelessWidget {
                 // ── Wolfram image ──────────────────────────────
                 if (message.wolframImage != null) ...[
                   GestureDetector(
-                    onTap: () => FullImagePreview.open(
+                    onTap: () => FullImagePreview.open(false,
                       context,
                       url: message.wolframImage,
                       // url:  "https://mathapi.dsrt321.online/media/chat_images/shape_55f304ffce0b4849b6059d7db6680f32.png",
@@ -52,7 +52,7 @@ class AiBubble extends StatelessWidget {
                       borderRadius: BorderRadius.circular(context.w(12)),
                       child: Image.network(
                         // "https://mathapi.dsrt321.online/media/chat_images/shape_55f304ffce0b4849b6059d7db6680f32.png",
-                        message.wolframImage!,
+                        "${message.wolframImage!}",
                         fit: BoxFit.contain,
                         loadingBuilder: (context, child, progress) {
                           if (progress == null) return child;

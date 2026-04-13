@@ -19,7 +19,7 @@ class ChatPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      // extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -199,7 +199,7 @@ class _ChatInputBar extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () =>
-                              FullImagePreview.open(context, file: file),
+                              FullImagePreview.open(false,context, file: file),
                           child: Container(
                             width: context.w(72),
                             height: context.w(72),

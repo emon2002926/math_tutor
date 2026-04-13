@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
+import 'core/constants/app_constant.dart';
 import 'features/language/data/app_translations.dart';
 import 'features/SplashScreen/controllers/splash1Controller.dart';
 import 'core/services/api_services.dart';
