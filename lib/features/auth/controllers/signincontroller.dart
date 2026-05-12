@@ -30,7 +30,7 @@ class SignInController extends GetxController {
       isPasswordVisible.value = !isPasswordVisible.value;
 
   void goToForgotPassword() => Get.to(() => ForgotPasswordPage());
-  void goToSignUp()         => Get.to(() => SignUpPage());
+  void goToSignUp() => Get.to(() => SignUpPage());
 
   void _showError(String message)   => CustomSnackBar.error(message);
   void _showSuccess(String message) => CustomSnackBar.success(message);
